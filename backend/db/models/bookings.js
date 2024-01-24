@@ -13,14 +13,45 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Bookings.init({
-    userId: DataTypes.INTEGER,
-    spotId: DataTypes.INTEGER,
-    startDate: DataTypes.DATE,
-    endDate: DataTypes.DATE
-  }, {
-    sequelize,
-    modelName: 'Bookings',
-  });
+  Bookings.init(
+    {
+      userId: {
+        type: DataTypes.INTEGER,
+      },
+
+      spotId: {
+        type: DataTypes.INTEGER,
+      },
+      startDate: {
+        type: DataTypes.DATE,
+        validate: {
+          isNull: false,
+          isDate: true,
+          laterThenToday(value) {
+            if (new Date(value) < new Date()) {
+              throw new Error("Date must be after today's date.")
+            }
+          }
+        }
+      },
+      endDate: {
+        type: DataTypes.DATE,
+        validate: {
+          isNull: false,
+          isDate: true,
+        }
+      },
+    },
+    {
+      sequelize,
+      modelName: 'Bookings',
+      validate: {
+        startDateAfterEndDate() {
+          if (this.startDate.isAfter(this.endDate)) {
+            throw new Error('End date must be after start date.');
+          }
+        }
+      }
+    });
   return Bookings;
 };

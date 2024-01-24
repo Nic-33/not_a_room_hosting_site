@@ -14,19 +14,87 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Spots.init({
-    ownerId: DataTypes.INTEGER,
-    address: DataTypes.STRING,
-    city: DataTypes.STRING,
-    state: DataTypes.STRING,
-    country: DataTypes.STRING,
-    lat: DataTypes.DECIMAL,
-    lan: DataTypes.DECIMAL,
-    name: DataTypes.STRING,
-    description: DataTypes.STRING,
-    price: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'Spots',
-  });
+    ownerId: {
+      type: DataTypes.INTEGER
+    },
+
+    address: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    city: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    state: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    country: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    lat: {
+      type: DataTypes.DECIMAL,
+      validate: {
+        min: -90,
+        max: 90
+      }
+    },
+
+    lan: {
+      type: DataTypes.DECIMAL,
+      validate: {
+        min: -180,
+        max: 180
+      }
+    },
+
+    name: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    description: {
+      type: DataTypes.STRING,
+      validate:{
+        isNull:false
+      }
+    },
+
+    price: {
+      type: DataTypes.INTEGER,
+      validate:{
+        isNull:false
+      }
+    }
+
+  },
+    {
+      sequelize,
+      validate: {
+        bothCoordsOrNone() {
+          if ((this.latitude === null) !== (this.longitude === null)) {
+            throw new Error('Either both latitude and longitude, or neither!');
+          }
+        },
+        modelName: 'Spots',
+      }
+    }
+  );
   return Spots;
 };

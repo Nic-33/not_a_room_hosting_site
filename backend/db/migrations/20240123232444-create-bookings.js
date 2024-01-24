@@ -22,11 +22,11 @@ module.exports = {
       },
       startDate: {
         type: Sequelize.DATE,
-        allowNull:false
+        allowNull: false
       },
       endDate: {
         type: Sequelize.DATE,
-        allowNull:false
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -38,7 +38,7 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
-    },options);
+    }, options);
   },
   async down(queryInterface, Sequelize) {
     options.tableName = 'Bookings'
