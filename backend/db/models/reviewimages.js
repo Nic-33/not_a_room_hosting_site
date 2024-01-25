@@ -11,6 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      ReviewImages.belongsTo(
+        models.Review, {
+        foreignKey: 'reviewId',
+        onDelete: 'CASCADE',
+        hooks: true
+      }
+      )
     }
   }
   ReviewImages.init({
@@ -19,14 +26,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     url: {
       type: DataTypes.STRING,
-      validator:{
-        isUrl:true
+      validator: {
+        isUrl: true
       }
     },
     preview: {
       type: DataTypes.BOOLEAN,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     }
   }, {

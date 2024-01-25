@@ -15,7 +15,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       reviewId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: { model: 'Reviews' }
       },
       url: {
         type: Sequelize.STRING
@@ -33,7 +34,7 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
-    },options);
+    }, options);
   },
   async down(queryInterface, Sequelize) {
     options.tableName = 'ReviewImages'

@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Spots.hasOne(
+        models.User, {
+        foreignKey: 'ownerId',
+        hooks: true
+      }
+      )
     }
   }
   Spots.init({
@@ -20,29 +26,29 @@ module.exports = (sequelize, DataTypes) => {
 
     address: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
     city: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
     state: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
     country: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
@@ -64,22 +70,22 @@ module.exports = (sequelize, DataTypes) => {
 
     name: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
     description: {
       type: DataTypes.STRING,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     },
 
     price: {
       type: DataTypes.INTEGER,
-      validate:{
-        isNull:false
+      validate: {
+        isNull: false
       }
     }
 
