@@ -94,7 +94,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'Spots',
       validate: {
         bothCoordsOrNone() {
-          if ((this.latitude === null) !== (this.longitude === null)) {
+          if ((this.lat === null) !== (this.lan === null)) {
             throw new Error('Either both latitude and longitude, or neither!');
           }
         },
