@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       }
       )
       Reviews.hasMany(
-        models.Spot, {
+        models.Spots, {
         foreignKey: 'spotId',
         onDelete: 'CASCADE',
         hooks: true
@@ -51,5 +51,5 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Reviews',
   });
-  return reviews;
+  return Reviews;
 };

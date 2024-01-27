@@ -11,10 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Spots.hasOne(
+      Spots.belongsTo(
         models.User, {
         foreignKey: 'ownerId',
-        hooks: true
       }
       )
     }
@@ -92,13 +91,13 @@ module.exports = (sequelize, DataTypes) => {
   },
     {
       sequelize,
+      modelName: 'Spots',
       validate: {
         bothCoordsOrNone() {
           if ((this.latitude === null) !== (this.longitude === null)) {
             throw new Error('Either both latitude and longitude, or neither!');
           }
         },
-        modelName: 'Spots',
       }
     }
   );

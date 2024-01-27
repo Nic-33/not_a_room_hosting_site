@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       ReviewImages.belongsTo(
-        models.Review, {
+        models.Reviews, {
         foreignKey: 'reviewId',
         onDelete: 'CASCADE',
         hooks: true
