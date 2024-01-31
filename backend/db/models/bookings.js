@@ -18,9 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         hooks: true
       }
       )
-      Bookings.hasMany(
+      Bookings.belongsTo(
         models.Spots, {
         foreignKey: 'spotId',
+        onDelete: 'CASCADE',
         hooks: true
       }
       )

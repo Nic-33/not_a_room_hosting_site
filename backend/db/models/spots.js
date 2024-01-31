@@ -11,9 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Spots.hasMany(
+        models.SpotImages, {
+        foreignKey: 'spotId',
+        onDelete: 'CASCADE'
+      }
+      )
+
       Spots.belongsTo(
         models.User, {
         foreignKey: 'ownerId',
+        as: 'Owner',
+        onDelete: 'CASCADE'
       }
       )
     }
@@ -25,30 +34,22 @@ module.exports = (sequelize, DataTypes) => {
 
     address: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
+
     },
 
     city: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
+
     },
 
     state: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
+
     },
 
     country: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
+
     },
 
     lat: {
@@ -69,36 +70,34 @@ module.exports = (sequelize, DataTypes) => {
 
     name: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
     },
 
     description: {
       type: DataTypes.STRING,
-      validate: {
-        isNull: false
-      }
+
     },
 
     price: {
       type: DataTypes.INTEGER,
-      validate: {
-        isNull: false
-      }
+
     }
 
   },
     {
       sequelize,
       modelName: 'Spots',
-      validate: {
-        bothCoordsOrNone() {
-          if ((this.lat === null) !== (this.lan === null)) {
-            throw new Error('Either both latitude and longitude, or neither!');
-          }
-        },
+      defaultScope: {
+        attributes: {
+          exclude: ["createdAt", "updatedAt"]
+        }
       }
+      // validate: {
+      //   bothCoordsOrNone() {
+      //     if ((this.lat === null) !== (this.lan === null)) {
+      //       throw new Error('Either both latitude and longitude, or neither!');
+      //     }
+      //   },
+      // }
     }
   );
   return Spots;
