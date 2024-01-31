@@ -32,9 +32,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     preview: {
       type: DataTypes.BOOLEAN,
-      validate: {
-        isNull: false
-      }
     }
   }, {
     sequelize,

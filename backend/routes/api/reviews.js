@@ -11,6 +11,107 @@ const { Model } = require('sequelize');
 
 const router = express.Router();
 
+const reviewValidation = [
+    check('review')
+        // need to fix review Validation
+        .exists({ checkFalsy: true })
+        .withMessage("Review Text is Required"),
+    check('stars')
+        .isLength({ min: 1 })
+        .isLength({ max: 5 })
+        .withMessage("Stars must be an integer from 1 to 5"),
+    handleValidationErrors
+]
+
+//needs work - has issues with foreign key
+router.delete(
+    '/:reviewId',
+    requireAuth,
+    async (req, res, next) => {
+        const { reviewId } = req.params
+        const deleteReview = await Reviews.findByPk(reviewId)
+
+        if (deleteReview === null) {
+            const err = new Error("review couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        deleteReview.destroy()
+
+        res.status(200)
+        res.json({ message: 'successfully deleted' })
+
+    }
+)
+
+router.put(
+    '/:reviewId',
+    requireAuth,
+    reviewValidation,
+    async (req, res, next) => {
+        const { reviewId } = req.params
+        const { review, stars } = req.body
+
+        const updateReview = await Reviews.findByPk(reviewId)
+
+        if (updateReview === null) {
+            const err = new Error("review couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        updateReview.set({
+            review: review,
+            stars: stars
+        })
+
+        await updateReview.save()
+
+        res.status(200)
+        res.json(updateReview)
+    }
+)
+
+router.post(
+    '/:reviewId/Images',
+    requireAuth,
+    async (req, res, next) => {
+        const { reviewId } = req.params
+        const { url } = req.body
+        const newReviewResponse = {}
+
+        const reviewExists = await Reviews.findByPk(reviewId)
+        if (reviewExists === null) {
+            const err = new Error("Review couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        const numberImages = await ReviewImages.count({
+            where: {
+                reviewId: reviewId
+            }
+        })
+        console.log('# of images:', numberImages)
+        if (numberImages > 10) {
+            const err = new Error("Maximum number of images for this resource was reached")
+            err.status = 403
+            return next(err)
+        }
+
+        const newReviewImage = await ReviewImages.create({
+            reviewId: reviewId,
+            url: url
+        })
+        await newReviewImage.save()
+        newReviewResponse.Id = newReviewImage.id
+        newReviewResponse.url = url
+        res.status(200)
+        res.json(newReviewResponse)
+    }
+)
+
 router.get(
     '/current',
     requireAuth,

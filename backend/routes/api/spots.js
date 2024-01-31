@@ -28,6 +28,7 @@ const spotValidation = [
         .withMessage('Country is required'),
     //need to figure out what the properties needs to be
     // check('lat')
+
     //     .withMessage('latitude is not valid'),
     // check('lng')
     //     .withMessage('longitude is not valid'),
@@ -44,6 +45,19 @@ const spotValidation = [
     handleValidationErrors
 ]
 
+const reviewValidation = [
+    check('review')
+        // need to fix review Validation
+        .exists({ checkFalsy: true })
+        .withMessage("Review Text is Required"),
+    check('stars')
+        .exists({ checkFalsy: true })
+        .isLength({ min: 1 })
+        .isLength({ max: 5 })
+        .withMessage("Stars must be an integer from 1 to 5"),
+    handleValidationErrors
+
+]
 
 //needs work - has issues with Foriegn key
 router.delete(
@@ -82,6 +96,42 @@ router.post(
         await newSpot.save()
         res.status(201)
         res.json(newSpot)
+    }
+)
+
+router.post(
+    '/:spotId/reviews',
+    requireAuth,
+    reviewValidation,
+    async (req, res, next) => {
+        const { user } = req
+        const { spotId } = req.params
+        const { review, stars } = req.body
+
+        const userReviews = await Reviews.findAll({ where: { userId: user.id } })
+        // console.log(userReviews.length)
+        if (userReviews.length > 0) {
+            const err = new Error("User already has a review for this spot")
+            err.status = 500
+            return next(err)
+        }
+        const spot = await Spots.findOne({ where: { id: spotId } })
+        if (spot === null) {
+            const err = new Error("Spot couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        const newReview = await Reviews.create({
+            userId: user.id,
+            spotId: spotId,
+            review: review,
+            stars: stars
+        })
+
+        await newReview.save()
+        res.status(201)
+        res.json(newReview)
     }
 )
 
