@@ -6,6 +6,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association her
       User.hasMany(
+        models.Bookings, {
+        foreignKey: 'userId',
+        onDelete: 'CASCADE',
+        hooks: true
+      }
+      )
+      User.hasMany(
         models.Spots, {
         foreignKey: 'ownerId',
         onDelete: 'CASCADE',
@@ -19,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
         hooks: true
       }
       )
-
     }
   };
 

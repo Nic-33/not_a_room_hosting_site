@@ -10,7 +10,42 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   async up(queryInterface, Sequelize) {
     await Bookings.bulkCreate([
-
+      {
+        userId: 1,
+        spotId: 2,
+        startDate: '2024-11-19',
+        endDate: '2024-11-20'
+      },
+      {
+        userId: 2,
+        spotId: 3,
+        startDate: '2024-10-19',
+        endDate: '2024-10-26'
+      },
+      {
+        userId: 3,
+        spotId: 4,
+        startDate: '2024-03-03',
+        endDate: '2024-03-08'
+      },
+      {
+        userId: 3,
+        spotId: 1,
+        startDate: '2024-07-07',
+        endDate: '2024-08-08'
+      },
+      {
+        userId: 2,
+        spotId: 3,
+        startDate: '2024-09-02',
+        endDate: '2024-09-20'
+      },
+      {
+        userId: 1,
+        spotId: 1,
+        startDate: '2024-01-01',
+        endDate: '2024-02-22'
+      },
     ])
   },
 
@@ -18,7 +53,7 @@ module.exports = {
     options.tableName = 'Bookings';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      username: { [Op.in]: ['Demo-lition', 'FakeUser1', 'FakeUser2'] }
+      userId: { [Op.in]: [1,2,3] }
     }, {});
   }
 };

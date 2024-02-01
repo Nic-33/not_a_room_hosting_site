@@ -14,15 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       Bookings.belongsTo(
         models.User, {
         foreignKey: "userId",
-        onDelete: 'CASCADE',
-        hooks: true
       }
       )
       Bookings.belongsTo(
         models.Spots, {
         foreignKey: 'spotId',
-        onDelete: 'CASCADE',
-        hooks: true
       }
       )
     }
@@ -39,19 +35,12 @@ module.exports = (sequelize, DataTypes) => {
       startDate: {
         type: DataTypes.DATE,
         validate: {
-          isNull: false,
-          isDate: true,
-          laterThenToday(value) {
-            if (new Date(value) < new Date()) {
-              throw new Error("Date must be after today's date.")
-            }
-          }
+          isDate: true
         }
       },
       endDate: {
         type: DataTypes.DATE,
         validate: {
-          isNull: false,
           isDate: true,
         }
       },
@@ -59,13 +48,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Bookings',
-      validate: {
-        startDateAfterEndDate() {
-          if (this.startDate.isAfter(this.endDate)) {
-            throw new Error('End date must be after start date.');
-          }
-        }
-      }
     });
   return Bookings;
 };

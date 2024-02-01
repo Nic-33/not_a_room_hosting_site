@@ -13,12 +13,13 @@ const router = express.Router();
 
 const reviewValidation = [
     check('review')
-        // need to fix review Validation
         .exists({ checkFalsy: true })
+        .notEmpty()
         .withMessage("Review Text is Required"),
     check('stars')
         .isLength({ min: 1 })
         .isLength({ max: 5 })
+        .exists({ checkFalsy: true })
         .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
 ]
@@ -30,18 +31,17 @@ router.delete(
     async (req, res, next) => {
         const { reviewId } = req.params
         const deleteReview = await Reviews.findByPk(reviewId)
-
+        // console.log(deleteReview)
         if (deleteReview === null) {
             const err = new Error("review couldn't be found")
             err.status = 404
             return next(err)
         }
 
-        deleteReview.destroy()
+        await deleteReview.destroy()
 
         res.status(200)
         res.json({ message: 'successfully deleted' })
-
     }
 )
 

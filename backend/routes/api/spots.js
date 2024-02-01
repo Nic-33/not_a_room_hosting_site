@@ -2,13 +2,12 @@ const express = require('express')
 const bcrypt = require('bcryptjs')
 
 const { setTokenCookie, requireAuth } = require('../../utils/auth')
-const { Spots, Reviews, SpotImages, User, ReviewImages } = require('../../db/models')
+const { Spots, Reviews, SpotImages, User, ReviewImages, Bookings } = require('../../db/models')
 
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const e = require('express');
 const { Model } = require('sequelize');
-const spots = require('../../db/models/spots');
 const { contentSecurityPolicy } = require('helmet');
 
 const router = express.Router();
@@ -26,12 +25,12 @@ const spotValidation = [
     check('country')
         .exists({ checkFalsy: true })
         .withMessage('Country is required'),
-    //need to figure out what the properties needs to be
-    // check('lat')
-
-    //     .withMessage('latitude is not valid'),
-    // check('lng')
-    //     .withMessage('longitude is not valid'),
+    check('lat')
+        .isLatLong()
+        .withMessage('latitude is not valid'),
+    check('lng')
+        .isLatLong()
+        .withMessage('longitude is not valid'),
     check('name')
         .exists({ checkFalsy: true })
         .isLength({ max: 50 })
@@ -47,8 +46,8 @@ const spotValidation = [
 
 const reviewValidation = [
     check('review')
-        // need to fix review Validation
         .exists({ checkFalsy: true })
+        .notEmpty()
         .withMessage("Review Text is Required"),
     check('stars')
         .exists({ checkFalsy: true })
@@ -56,18 +55,33 @@ const reviewValidation = [
         .isLength({ max: 5 })
         .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
-
 ]
 
-//needs work - has issues with Foriegn key
+const bookingValidation = [
+    check('startDate')
+        .exists({ checkFalsy: true })
+        .isDate(),
+    check('endDate')
+        .exists({ checkFalsy: true })
+        .isDate()
+]
+
 router.delete(
     '/:spotId',
     requireAuth,
     async (req, res) => {
         const { spotId } = req.params
         const deleteSpot = await Spots.findByPk(spotId)
+
+        if (deleteSpot === null) {
+            const err = new Error("Spot couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
         await deleteSpot.destroy()
-        res.statusCode(200)
+
+        res.status(200)
         res.json({ message: 'Successfully deleted' })
     }
 )
@@ -96,6 +110,74 @@ router.post(
         await newSpot.save()
         res.status(201)
         res.json(newSpot)
+    }
+)
+
+router.post(
+    '/:spotId/bookings',
+    requireAuth,
+
+    async (req, res, next) => {
+        const { user } = req
+        const { spotId } = req.params
+        const { startDate, endDate } = req.body
+        let newBooking
+
+        if (new Date(startDate) >= new Date(endDate)) {
+            const err = new Error('Bad request')
+            err.error = "endDate cannot be on or before startDate"
+            err.status = 404
+            return next(err)
+        }
+
+        const spotDetails = await Spots.findByPk(spotId)
+        if (spotDetails === null) {
+            const err = new Error("Spot couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        const spotBookings = await Bookings.findAll({
+            where: {
+                spotId: spotId
+            },
+            attributes: [
+                'startDate',
+                'endDate'
+            ]
+        })
+        // console.log(spotBookings)
+
+        spotBookings.forEach(ele => {
+            let bookingStartDate = new Date(ele.startDate)
+            let bookingEndDate = new Date(ele.endDate)
+            let newBookingStartDate = new Date(startDate)
+            let newBookingEndDate = new Date(endDate)
+
+            if (newBookingStartDate <= bookingStartDate && newBookingEndDate >= bookingStartDate ||
+                newBookingStartDate <= bookingEndDate && newBookingEndDate >= bookingEndDate) {
+                console.log('conflict is:', bookingStartDate, '-', bookingEndDate)
+                const err = new Error("conflict in booking")
+                err.status = 403
+                return next(err)
+            }
+        });
+
+        if (user.id !== spotDetails.ownerId) {
+            newBooking = await Bookings.create({
+                spotId: parseInt(spotId),
+                userId: user.id,
+                startDate: startDate,
+                endDate: endDate
+            })
+            await newBooking.save()
+        } else {
+            const err = new Error("you already own this silly")
+            err.status = 400
+            return next(err)
+        }
+
+        res.json(newBooking)
     }
 )
 
@@ -302,6 +384,62 @@ router.get(
         res.json(infoSpots)
     }
 
+)
+
+router.get(
+    '/:spotId/bookings',
+    requireAuth,
+    async (req, res, next) => {
+        const { spotId } = req.params
+        const { user } = req
+        const responseBooking = { Bookings: [] }
+
+        const spotDetails = await Spots.findByPk(spotId)
+
+        if (spotDetails === null) {
+            const err = new Error("Spot couldn't be found")
+            err.status = 404
+            return next(err)
+        }
+
+        const spotBookings = await Bookings.findAll({
+            where: {
+                spotId: spotId
+            },
+            include: {
+                model: User
+            },
+        })
+
+        if (spotDetails.ownerId === user.id) {
+            for (let i = 0; i < spotBookings.length; i++) {
+                const ele = spotBookings[i];
+                responseBooking.Bookings.push({
+                    User: ele.User,
+                    id: ele.id,
+                    spotId: ele.spotId,
+                    userId: ele.userId,
+                    startDate: ele.startDate,
+                    endDate: ele.endDate,
+                    createdAt: ele.createdAt,
+                    updatedAt: ele.updatedAt
+                })
+            }
+
+        } else {
+            for (let i = 0; i < spotBookings.length; i++) {
+                const ele = spotBookings[i];
+                responseBooking.Bookings.push({
+                    spotId: ele.spotId,
+                    startDate: ele.startDate,
+                    endDate: ele.endDate
+                })
+            }
+        }
+        // console.log(spotDetails)
+
+        res.json(responseBooking)
+    }
 )
 
 router.get(
