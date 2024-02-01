@@ -123,7 +123,9 @@ router.get(
                 userId: user.id
             }
         })
-        const reviewUser = await User.findByPk(user.id)
+        const reviewUser = await User.findByPk(user.id, {
+            attributes: ['id', 'firstName', 'lastName']
+        })
         for (let i = 0; i < userReviews.length; i++) {
             const ele = userReviews[i];
             const reviewSpot = await Spots.findByPk(ele.spotId)

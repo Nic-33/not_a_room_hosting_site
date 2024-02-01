@@ -407,7 +407,8 @@ router.get(
                 spotId: spotId
             },
             include: {
-                model: User
+                model: User,
+                attributes: ['id', 'firstName', 'lastName']
             },
         })
 
@@ -461,7 +462,9 @@ router.get(
         }
         for (let i = 0; i < spotReviews.length; i++) {
             const ele = spotReviews[i];
-            const reviewUser = await User.findByPk(ele.userId)
+            const reviewUser = await User.findByPk(ele.userId, {
+                attributes: ['id', 'firstName', 'lastName']
+            })
             const reviewImage = await ReviewImages.findByPk(ele.id)
             ele.dataValues.User = reviewUser
             ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
@@ -479,8 +482,9 @@ router.get(
         const spot = await Spots.findByPk(spotId, {
             include: {
                 model: User,
-                as: 'Owner'
-            }
+                as: 'Owner',
+                attributes: ['id', 'firstName', 'lastName']
+            },
         })
         if (spot === null) {
             const err = new Error("Spot couldn't be found")
@@ -503,9 +507,27 @@ router.get(
             }
         })
         reviewRating = reviewRating / totalReviews.count
-        spot.dataValues.avgStarRating = reviewRating
-        spot.dataValues.numReviews = totalReviews.count
-        res.json(spot)
+
+        const responseSpot = {
+            id: spotId,
+            ownerId: spot.ownerId,
+            address: spot.address,
+            city: spot.city,
+            state: spot.state,
+            country: spot.country,
+            lat: spot.lat,
+            lng: spot.lng,
+            description: spot.description,
+            price: spot.price,
+            createdAt: spot.createdAt,
+            updatedAt: spot.updatedAt,
+            numReviews: totalReviews.count,
+            avgStarRating: reviewRating,
+            SpotImages: spotIm,
+            Owner: spot.Owner
+        }
+
+        res.json(responseSpot)
     }
 )
 

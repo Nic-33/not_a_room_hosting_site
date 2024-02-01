@@ -100,7 +100,7 @@ router.put(
             let newBookingEndDate = new Date(endDate)
             if (newBookingStartDate <= bookingStartDate && newBookingEndDate >= bookingStartDate ||
                 newBookingStartDate <= bookingEndDate && newBookingEndDate >= bookingEndDate) {
-                const err = new Error("confilict in booking")
+                const err = new Error("conflict in booking")
                 err.status = 403
                 return next(err)
             }
