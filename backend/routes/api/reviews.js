@@ -30,10 +30,18 @@ router.delete(
     async (req, res, next) => {
         const { reviewId } = req.params
         const deleteReview = await Reviews.findByPk(reviewId)
+
         // console.log(deleteReview)
         if (deleteReview === null) {
             const err = new Error("review couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        const { user } = req
+        if (deleteReview.userId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -57,6 +65,13 @@ router.put(
         if (updateReview === null) {
             const err = new Error("review couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        const { user } = req
+        if (updateReview.userId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -84,6 +99,13 @@ router.post(
         if (reviewExists === null) {
             const err = new Error("Review couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        const { user } = req
+        if (reviewExists.userId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 

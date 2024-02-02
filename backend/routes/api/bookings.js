@@ -21,12 +21,6 @@ router.delete(
 
         const deleteBooking = await Bookings.findByPk(bookingId)
 
-        if (deleteBooking.userId !== user.id) {
-            const err = new Error("you do not own the booking")
-            err.status = 400
-            return next(err)
-        }
-
         if (deleteBooking === null) {
             const err = new Error("Booking couldn't be found")
             err.status = 404
@@ -39,6 +33,13 @@ router.delete(
             return next(err)
         }
 
+
+        if (deleteBooking.userId !== user.id) {
+            const err = new Error("Forbidden")
+            err.status = 403
+            return next(err)
+        }
+        
         await deleteBooking.destroy()
 
         res.status(200)
@@ -76,8 +77,8 @@ router.put(
         }
 
         if (editBooking.userId !== user.id) {
-            const err = new Error("you do not own the booking")
-            err.status = 400
+            const err = new Error("forbidden")
+            err.status = 403
             return next(err)
         }
 

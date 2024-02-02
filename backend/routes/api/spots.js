@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs')
 const { setTokenCookie, requireAuth } = require('../../utils/auth')
 const { Spots, Reviews, SpotImages, User, ReviewImages, Bookings } = require('../../db/models')
 
-const { check } = require('express-validator');
+const { check, query } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const e = require('express');
 const { Model, Op } = require('sequelize');
@@ -13,29 +13,37 @@ const { contentSecurityPolicy } = require('helmet');
 const router = express.Router();
 
 const paramsValidation = [
-    check('page')
+    query('page')
+        .default(1)
         .isInt({ min: 1, max: 10 })
         .withMessage("Page must be greater than or equal to 1"),
-    check('size')
+    query('size')
+        .default(20)
         .isInt({ min: 1, max: 20 })
         .withMessage("Size must be greater than or equal to 1"),
-    check('maxLat')
-        .isDecimal()
+    query('maxLat')
+        .optional()
+        .isFloat({ min: -90, max: 90 })
         .withMessage("Maximum latitude is invalid"),
-    check('minLat')
-        .isDecimal()
+    query('minLat')
+        .optional()
+        .isFloat({ min: -90, max: 90 })
         .withMessage("Minimum latitude is invalid"),
-    check('maxLng')
-        .isDecimal()
+    query('maxLng')
+        .optional()
+        .isFloat({ min: -180, max: 180 })
         .withMessage("Maximum longitude is invalid"),
-    check('minLng')
-        .isDecimal()
+    query('minLng')
+        .optional()
+        .isFloat({ min: -180, max: 180 })
         .withMessage("Minimum longitude is invalid"),
-    check('minPrice')
-        .isDecimal({ min: 0 })
+    query('minPrice')
+        .optional()
+        .isInt({ min: 0 })
         .withMessage('Minimum price must be greater than or equal to 0'),
-    check('maxPrice')
-        .isDecimal({ min: 0 })
+    query('maxPrice')
+        .optional()
+        .isInt({ min: 0 })
         .withMessage('Minimum price must be greater than or equal to 0'),
     handleValidationErrors
 ]
@@ -54,10 +62,12 @@ const spotValidation = [
         .exists({ checkFalsy: true })
         .withMessage('Country is required'),
     check('lat')
-        .isLatLong()
+        .optional()
+        .isFloat({ min: -90, max: 90 })
         .withMessage('latitude is not valid'),
     check('lng')
-        .isLatLong()
+        .optional()
+        .isFloat({ min: -180, max: 180 })
         .withMessage('longitude is not valid'),
     check('name')
         .exists({ checkFalsy: true })
@@ -96,10 +106,15 @@ const bookingValidation = [
 router.delete(
     '/:spotId',
     requireAuth,
-    async (req, res) => {
+    async (req, res, next) => {
         const { spotId } = req.params
         const deleteSpot = await Spots.findByPk(spotId)
-
+        const { user } = req
+        if (deleteSpot.ownerId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
+            return next(err)
+        }
         if (deleteSpot === null) {
             const err = new Error("Spot couldn't be found")
             err.status = 404
@@ -233,7 +248,7 @@ router.post(
 
         const newReview = await Reviews.create({
             userId: user.id,
-            spotId: spotId,
+            spotId: parseInt(spotId),
             review: review,
             stars: stars
         })
@@ -254,9 +269,17 @@ router.post(
         const response = {}
 
         const spot = await Spots.findByPk(spotId)
+
+
         if (spot === null) {
             const err = new Error("Spot couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        if (spot.ownerId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -292,6 +315,13 @@ router.put(
             return next(err)
         }
 
+        const { user } = req
+        if (updateSpot.ownerId !== user.Id) {
+            const err = new Error("Forbidden")
+            err.status = 403
+            return next(err)
+        }
+
         updateSpot.set({
             address: address,
             city: city,
@@ -316,6 +346,7 @@ router.get(
     paramsValidation,
     async (req, res) => {
         const infoSpots = {}
+
         let { minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query
 
         let query = {
@@ -379,10 +410,12 @@ router.get(
                 where: {
                     spotId: ele.id,
                     preview: true
-                }
+                },
+                attributes: ['url']
             })
-            // console.log("PVI:", preImage[0].url)
-            ele.dataValues.previewImage = preImage[0].url
+            if (preImage.length > 0) {
+                ele.dataValues.previewImage = preImage[0]
+            }
             // console.log('ele:', ele)
         }
 
@@ -437,8 +470,10 @@ router.get(
             })
 
             // console.log("PVI:", preImage)
-            ele.dataValues.previewImage = preImage[0].url
-            console.log('ele:', ele)
+            if (preImage.length > 0) {
+                ele.dataValues.previewImage = preImage[0].url
+            }
+            // console.log('ele:', ele)
             userSpots[i] = ele
 
         }
@@ -474,7 +509,7 @@ router.get(
                 attributes: ['id', 'firstName', 'lastName']
             },
         })
-
+        console.log('sb:', spotBookings)
         if (spotDetails.ownerId === user.id) {
             for (let i = 0; i < spotBookings.length; i++) {
                 const ele = spotBookings[i];
@@ -516,7 +551,7 @@ router.get(
                 spotId: spotId
             }
         })
-        console.log('Sr:', spotReviews)
+        // console.log('Sr:', spotReviews)
         const spot = await Spots.findOne({ where: { id: spotId } })
         if (spot === null) {
             const err = new Error("Spot couldn't be found")

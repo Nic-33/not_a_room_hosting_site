@@ -33,7 +33,7 @@ router.delete(
         }
 
         if (user.id !== deleteImage.Spot.ownerId) {
-            const err = new Error()
+            const err = new Error("forbidden")
             err.status = 403
             return next(err)
         }
