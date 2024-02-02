@@ -7,10 +7,38 @@ const { Spots, Reviews, SpotImages, User, ReviewImages, Bookings } = require('..
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const e = require('express');
-const { Model } = require('sequelize');
+const { Model, Op } = require('sequelize');
 const { contentSecurityPolicy } = require('helmet');
 
 const router = express.Router();
+
+const paramsValidation = [
+    check('page')
+        .isInt({ min: 1, max: 10 })
+        .withMessage("Page must be greater than or equal to 1"),
+    check('size')
+        .isInt({ min: 1, max: 20 })
+        .withMessage("Size must be greater than or equal to 1"),
+    check('maxLat')
+        .isDecimal()
+        .withMessage("Maximum latitude is invalid"),
+    check('minLat')
+        .isDecimal()
+        .withMessage("Minimum latitude is invalid"),
+    check('maxLng')
+        .isDecimal()
+        .withMessage("Maximum longitude is invalid"),
+    check('minLng')
+        .isDecimal()
+        .withMessage("Minimum longitude is invalid"),
+    check('minPrice')
+        .isDecimal({ min: 0 })
+        .withMessage('Minimum price must be greater than or equal to 0'),
+    check('maxPrice')
+        .isDecimal({ min: 0 })
+        .withMessage('Minimum price must be greater than or equal to 0'),
+    handleValidationErrors
+]
 
 const spotValidation = [
     check('address')
@@ -51,8 +79,7 @@ const reviewValidation = [
         .withMessage("Review Text is Required"),
     check('stars')
         .exists({ checkFalsy: true })
-        .isLength({ min: 1 })
-        .isLength({ max: 5 })
+        .isInt({ min: 1, max: 5 })
         .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
 ]
@@ -286,9 +313,45 @@ router.put(
 
 router.get(
     '/',
+    paramsValidation,
     async (req, res) => {
-        let infoSpots = {}
-        const spots = await Spots.findAll()
+        const infoSpots = {}
+        let { minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query
+
+        let query = {
+            where: {},
+            include: [],
+        }
+
+        const page = req.query.page === undefined ? 1 : parseInt(req.query.page);
+        const size = req.query.size === undefined ? 20 : parseInt(req.query.size);
+        if ((page >= 1 && page <= 10) && (size >= 1 && size <= 20)) {
+            query.limit = size;
+            query.offset = size * (page - 1);
+        }
+
+        if (minLat && maxLat) {
+            query.where.lat = { [Op.gte]: minLat, [Op.lte]: maxLat }
+        } else {
+            if (minLat) { query.where.lat = { [Op.gte]: minLat } }
+            if (maxLat) { query.where.lat = { [Op.lte]: maxLat } }
+        }
+
+        if (minLng && maxLng) {
+            query.where.lan = { [Op.gte]: minLng, [Op.lte]: maxLng }
+        } else {
+            if (minLng) { query.where.lan = { [Op.gte]: minLng } }
+            if (maxLng) { query.where.lan = { [Op.lte]: maxLng } }
+        }
+
+        if (minPrice && maxPrice) {
+            query.where.price = { [Op.gte]: minPrice, [Op.lte]: maxPrice }
+        } else {
+            if (minPrice) { query.where.Price = { [Op.gte]: minPrice } }
+            if (maxPrice) { query.where.Price = { [Op.lte]: maxPrice } }
+        }
+
+        const spots = await Spots.findAll(query)
         for (let i = 0; i < spots.length; i++) {
             const ele = spots[i];
             // console.log(spots)
