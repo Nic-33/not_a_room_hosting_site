@@ -77,7 +77,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
 
-    lan: {
+    lng: {
       type: DataTypes.DECIMAL,
       validate: {
         min: -180,

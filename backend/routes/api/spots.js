@@ -338,10 +338,10 @@ router.get(
         }
 
         if (minLng && maxLng) {
-            query.where.lan = { [Op.gte]: minLng, [Op.lte]: maxLng }
+            query.where.lng = { [Op.gte]: minLng, [Op.lte]: maxLng }
         } else {
-            if (minLng) { query.where.lan = { [Op.gte]: minLng } }
-            if (maxLng) { query.where.lan = { [Op.lte]: maxLng } }
+            if (minLng) { query.where.lng = { [Op.gte]: minLng } }
+            if (maxLng) { query.where.lng = { [Op.lte]: maxLng } }
         }
 
         if (minPrice && maxPrice) {
