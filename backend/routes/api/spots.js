@@ -110,17 +110,19 @@ router.delete(
         const { spotId } = req.params
         const deleteSpot = await Spots.findByPk(spotId)
         const { user } = req
-        if (deleteSpot.ownerId !== user.Id) {
-            const err = new Error("Forbidden")
-            err.status = 403
-            return next(err)
-        }
+        const userId = user.id
+
         if (deleteSpot === null) {
             const err = new Error("Spot couldn't be found")
             err.status = 404
             return next(err)
         }
 
+        if (deleteSpot.ownerId !== userId) {
+            const err = new Error("Forbidden")
+            err.status = 403
+            return next(err)
+        }
         await deleteSpot.destroy()
 
         res.status(200)
@@ -166,8 +168,7 @@ router.post(
         let newBooking
 
         if (new Date(startDate) >= new Date(endDate)) {
-            const err = new Error('Bad request')
-            err.error = "endDate cannot be on or before startDate"
+            const err = new Error("endDate cannot be on or before startDate")
             err.status = 404
             return next(err)
         }
@@ -188,22 +189,29 @@ router.post(
                 'endDate'
             ]
         })
-        // console.log(spotBookings)
 
-        spotBookings.forEach(ele => {
+        for (let i = 0; i < spotBookings.length; i++) {
+            const ele = spotBookings[i];
             let bookingStartDate = new Date(ele.startDate)
             let bookingEndDate = new Date(ele.endDate)
             let newBookingStartDate = new Date(startDate)
             let newBookingEndDate = new Date(endDate)
 
-            if (newBookingStartDate <= bookingStartDate && newBookingEndDate >= bookingStartDate ||
-                newBookingStartDate <= bookingEndDate && newBookingEndDate >= bookingEndDate) {
-                console.log('conflict is:', bookingStartDate, '-', bookingEndDate)
+
+            if (newBookingStartDate >= bookingStartDate && newBookingStartDate <= bookingEndDate) {
                 const err = new Error("conflict in booking")
                 err.status = 403
                 return next(err)
             }
-        });
+
+            if (newBookingEndDate >= bookingStartDate && newBookingEndDate <= bookingEndDate) {
+                const err = new Error("conflict in booking")
+                err.status = 403
+                return next(err)
+            }
+
+        }
+        // console.log(spotBookings)
 
         if (user.id !== spotDetails.ownerId) {
             newBooking = await Bookings.create({
@@ -270,18 +278,21 @@ router.post(
 
         const spot = await Spots.findByPk(spotId)
 
+        const userId = user.id
+        // console.log(userId)
 
         if (spot === null) {
             const err = new Error("Spot couldn't be found")
             err.status = 404
             return next(err)
         }
-
-        if (spot.ownerId !== user.Id) {
+        if (spot.ownerId !== userId) {
+            // console.log(`${spot.ownerId} should not equal ${user.Id}`)
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)
         }
+        console.log(`${spot.ownerId} should equal ${user.Id}`)
 
         const newSpotImage = await SpotImages.create({
             spotId: spotId,
@@ -316,7 +327,8 @@ router.put(
         }
 
         const { user } = req
-        if (updateSpot.ownerId !== user.Id) {
+        const userId = user.id
+        if (updateSpot.ownerId !== userId) {
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)

@@ -39,7 +39,8 @@ router.delete(
         }
 
         const { user } = req
-        if (deleteReview.userId !== user.Id) {
+        const userId = user.id
+        if (deleteReview.userId !== userId) {
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)
@@ -69,7 +70,8 @@ router.put(
         }
 
         const { user } = req
-        if (updateReview.userId !== user.Id) {
+        const userId = user.id
+        if (updateReview.userId !== userId) {
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)
@@ -103,7 +105,8 @@ router.post(
         }
 
         const { user } = req
-        if (reviewExists.userId !== user.Id) {
+        const userId = user.id
+        if (reviewExists.userId !== userId) {
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)

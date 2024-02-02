@@ -33,13 +33,13 @@ router.delete(
             return next(err)
         }
 
-
-        if (deleteBooking.userId !== user.id) {
+        const userId = user.id
+        if (deleteBooking.userId !== userId) {
             const err = new Error("Forbidden")
             err.status = 403
             return next(err)
         }
-        
+
         await deleteBooking.destroy()
 
         res.status(200)
@@ -70,13 +70,12 @@ router.put(
         }
 
         if (new Date(startDate) >= new Date(endDate)) {
-            const err = new Error('Bad request')
-            err.error = "endDate cannot be on or before startDate"
+            const err = new Error("endDate cannot be on or before startDate")
             err.status = 404
             return next(err)
         }
-
-        if (editBooking.userId !== user.id) {
+        const userId = user.id
+        if (editBooking.userId !== userId) {
             const err = new Error("forbidden")
             err.status = 403
             return next(err)
@@ -94,18 +93,27 @@ router.put(
         })
         // console.log(spotBookings)
 
-        spotBookings.forEach(ele => {
+        for (let i = 0; i < spotBookings.length; i++) {
+            const ele = spotBookings[i];
             let bookingStartDate = new Date(ele.startDate)
             let bookingEndDate = new Date(ele.endDate)
             let newBookingStartDate = new Date(startDate)
             let newBookingEndDate = new Date(endDate)
-            if (newBookingStartDate <= bookingStartDate && newBookingEndDate >= bookingStartDate ||
-                newBookingStartDate <= bookingEndDate && newBookingEndDate >= bookingEndDate) {
+
+
+            if (newBookingStartDate >= bookingStartDate && newBookingStartDate <= bookingEndDate) {
                 const err = new Error("conflict in booking")
                 err.status = 403
                 return next(err)
             }
-        });
+
+            if (newBookingEndDate >= bookingStartDate && newBookingEndDate <= bookingEndDate) {
+                const err = new Error("conflict in booking")
+                err.status = 403
+                return next(err)
+            }
+
+        }
 
         editBooking.set({
             startDate: startDate,
