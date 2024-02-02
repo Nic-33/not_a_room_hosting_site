@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
   up: (queryInterface, Sequelize) => {
     options.tableName = 'Users';     // define table name in options object
-    return queryInterface.bulkInsert(options,[
+    return queryInterface.bulkInsert(options, [
       {
         firstName: 'John',
         lastName: 'Doe',
@@ -36,7 +36,7 @@ module.exports = {
       {
         firstName: 'Miles',
         lastName: 'Moralis',
-        email: 'first.test@gmail.com',
+        email: 'spidey@gmail.com',
         username: 'spiderman',
         hashedPassword: bcrypt.hashSync('secret password')
       },
