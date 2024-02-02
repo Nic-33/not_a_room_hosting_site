@@ -8,8 +8,9 @@ if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;  // define your schema in options object
 }
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await Bookings.bulkCreate([
+  up: (queryInterface, Sequelize) => {
+    options.tableName = 'Bookings';     // define table name in options object
+    return queryInterface.bulkInsert(options,[
       {
         userId: 1,
         spotId: 2,
@@ -49,7 +50,7 @@ module.exports = {
     ])
   },
 
-  async down(queryInterface, Sequelize) {
+  down: (queryInterface, Sequelize) => {
     options.tableName = 'Bookings';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {

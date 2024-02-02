@@ -9,8 +9,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await User.bulkCreate([
+  up: (queryInterface, Sequelize) => {
+    options.tableName = 'Users';     // define table name in options object
+    return queryInterface.bulkInsert(options,[
       {
         firstName: 'John',
         lastName: 'Doe',
@@ -42,7 +43,7 @@ module.exports = {
     ], { validate: true });
   },
 
-  async down(queryInterface, Sequelize) {
+  down: (queryInterface, Sequelize) => {
     options.tableName = 'Users';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {

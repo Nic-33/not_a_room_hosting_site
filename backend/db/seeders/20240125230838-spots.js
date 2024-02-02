@@ -9,9 +9,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    try {
-      await Spots.bulkCreate([
+  up: (queryInterface, Sequelize) => {
+    options.tableName = 'Spots';     // define table name in options object
+    return queryInterface.bulkInsert(options,[
         {
           ownerId: 1,
           address: "123 Disney Lane",
@@ -55,13 +55,10 @@ module.exports = {
           price: 249
         },
       ],)
-    } catch (err) {
-      console.log(err)
-      throw Error(err)
-    }
+
   },
 
-  async down(queryInterface, Sequelize) {
+  down: (queryInterface, Sequelize) => {
     options.tableName = 'Spots';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {

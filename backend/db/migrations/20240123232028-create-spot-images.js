@@ -3,10 +3,10 @@
 let options = {};
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;  // define your schema in options object
-
-} module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('SpotImages', {
+}
+module.exports = {
+  up:(queryInterface, Sequelize) => {
+    return queryInterface.createTable('SpotImages', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -38,8 +38,7 @@ if (process.env.NODE_ENV === 'production') {
       }
     }, options);
   },
-  async down(queryInterface, Sequelize) {
-    options.tableName = 'SpotImages'
-    return queryInterface.dropTable(options);
+  down: async (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('SpotImages', options);
   }
 };
