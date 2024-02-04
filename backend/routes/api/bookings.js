@@ -113,6 +113,12 @@ router.put(
                 return next(err)
             }
 
+            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate) {
+                const err = new Error("conflict in booking")
+                err.status = 403
+                return next(err)
+            }
+
         }
 
         editBooking.set({

@@ -210,6 +210,12 @@ router.post(
                 return next(err)
             }
 
+            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate) {
+                const err = new Error("conflict in booking")
+                err.status = 403
+                return next(err)
+            }
+
         }
         // console.log(spotBookings)
 
@@ -240,7 +246,7 @@ router.post(
         const { spotId } = req.params
         const { review, stars } = req.body
 
-        const userReviews = await Reviews.findAll({ where: { userId: user.id } })
+        const userReviews = await Reviews.findAll({ where: { userId: user.id, spotId: spotId } })
         // console.log(userReviews.length)
         if (userReviews.length > 0) {
             const err = new Error("User already has a review for this spot")
@@ -317,7 +323,7 @@ router.put(
     spotValidation,
     async (req, res, next) => {
         const { spotId } = req.params
-        const updateSpot = await Spots.findByPk(spotId)
+        const updateSpot = await Spots.unscoped().findByPk(spotId)
         const { address, city, state, country, lat, lng, name, description, price } = req.body
 
         if (updateSpot === null) {
@@ -343,11 +349,10 @@ router.put(
             lng: lng,
             name: name,
             description: description,
-            price: price
+            price: price,
         })
 
         await updateSpot.save()
-
         res.status(200)
         res.json(updateSpot)
     }
@@ -394,7 +399,7 @@ router.get(
             if (maxPrice) { query.where.Price = { [Op.lte]: maxPrice } }
         }
 
-        const spots = await Spots.findAll(query)
+        const spots = await Spots.unscoped().findAll(query)
         for (let i = 0; i < spots.length; i++) {
             const ele = spots[i];
             // console.log(spots)
@@ -443,7 +448,7 @@ router.get(
         const { user } = req
         // console.log(user)
         let infoSpots = {}
-        const userSpots = await Spots.findAll({
+        const userSpots = await Spots.unscoped().findAll({
             where: {
                 ownerId: user.id
             }
@@ -572,14 +577,16 @@ router.get(
         }
         for (let i = 0; i < spotReviews.length; i++) {
             const ele = spotReviews[i];
+            console.log(ele)
             const reviewUser = await User.findByPk(ele.userId, {
                 attributes: ['id', 'firstName', 'lastName']
             })
             const reviewImage = await ReviewImages.findByPk(ele.id)
             ele.dataValues.User = reviewUser
-            ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
-            // console.log('ele:', ele)
-            spotResponse.Review[i] = ele
+            if (reviewImage !== null) {
+                ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+            }// console.log('ele:', ele)
+            spotResponse.Review.push(ele)
         }
         res.json(spotResponse)
     }

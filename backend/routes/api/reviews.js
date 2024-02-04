@@ -118,7 +118,7 @@ router.post(
             }
         })
         console.log('# of images:', numberImages)
-        if (numberImages > 10) {
+        if (numberImages >= 10) {
             const err = new Error("Maximum number of images for this resource was reached")
             err.status = 403
             return next(err)
@@ -129,7 +129,7 @@ router.post(
             url: url
         })
         await newReviewImage.save()
-        newReviewResponse.Id = newReviewImage.id
+        newReviewResponse.id = newReviewImage.id
         newReviewResponse.url = url
         res.status(200)
         res.json(newReviewResponse)
@@ -141,7 +141,7 @@ router.get(
     requireAuth,
     async (req, res) => {
         const { user } = req
-        const reviewResponse = {}
+        const reviewResponse = { Review: [] }
         const userReviews = await Reviews.findAll({
             where: {
                 userId: user.id
@@ -156,9 +156,11 @@ router.get(
             const reviewImage = await ReviewImages.findByPk(ele.id)
             ele.dataValues.User = reviewUser
             ele.dataValues.Spot = reviewSpot
-            ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+            if (reviewImage !== null) {
+                ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+            }
             // console.log(ele)
-            reviewResponse.Review = ele
+            reviewResponse.Review.push(ele)
         }
         // console.log(userReviews)
         res.json(reviewResponse)
