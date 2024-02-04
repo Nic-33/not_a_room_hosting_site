@@ -101,20 +101,27 @@ router.put(
             let newBookingEndDate = new Date(endDate)
 
 
+            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate ||
+                newBookingStartDate > bookingStartDate && newBookingEndDate < bookingEndDate) {
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = {
+                    startDate: "Start date conflicts with an existing booking",
+                    endDate: "End date conflicts with an existing booking"
+                }
+                err.status = 403
+                return next(err)
+            }
+
             if (newBookingStartDate >= bookingStartDate && newBookingStartDate <= bookingEndDate) {
-                const err = new Error("conflict in booking")
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { startDate: "Start date conflicts with an existing booking" }
                 err.status = 403
                 return next(err)
             }
 
             if (newBookingEndDate >= bookingStartDate && newBookingEndDate <= bookingEndDate) {
-                const err = new Error("conflict in booking")
-                err.status = 403
-                return next(err)
-            }
-
-            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate) {
-                const err = new Error("conflict in booking")
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { endDate: "End date conflicts with an existing booking" }
                 err.status = 403
                 return next(err)
             }
@@ -145,6 +152,7 @@ router.get(
             },
             include: [{
                 model: Spots,
+                attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'price']
             }]
         })
         for (let i = 0; i < userBookings.length; i++) {

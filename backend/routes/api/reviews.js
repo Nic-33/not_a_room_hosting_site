@@ -18,6 +18,7 @@ const reviewValidation = [
         .withMessage("Review Text is Required"),
     check('stars')
         .isInt({ min: 1, max: 5 })
+        .withMessage("Stars must be an integer from 1 to 5")
         .exists({ checkFalsy: true })
         .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
@@ -152,12 +153,29 @@ router.get(
         })
         for (let i = 0; i < userReviews.length; i++) {
             const ele = userReviews[i];
-            const reviewSpot = await Spots.findByPk(ele.spotId)
-            const reviewImage = await ReviewImages.findByPk(ele.id)
+            const reviewSpot = await Spots.findByPk(ele.spotId, {
+                attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'price']
+            })
+            const reviewSpotPreview = await SpotImages.findAll({
+                where: { spotId: reviewSpot.id, preview: true },
+                attributes: ['url']
+            })
+
+            console.log(reviewSpotPreview[0])
+
+            reviewSpot.dataValues.previewImage = reviewSpotPreview[0].url
+
+            console.log('spot info:', reviewSpot)
+
+            const reviewImage = await ReviewImages.findAll({
+                where: { reviewId: ele.id },
+                attributes: ['id', 'url']
+            })
+            // console.log('these are the images:', reviewImage)
             ele.dataValues.User = reviewUser
             ele.dataValues.Spot = reviewSpot
             if (reviewImage !== null) {
-                ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+                ele.dataValues.ReviewImages = reviewImage
             }
             // console.log(ele)
             reviewResponse.Review.push(ele)

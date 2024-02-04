@@ -77,6 +77,8 @@ const spotValidation = [
         .exists({ checkFalsy: true })
         .withMessage('Description is required'),
     check('price')
+        .isInt({ min: 0 })
+        .withMessage('Price must be a positive number')
         .exists({ checkFalsy: true })
         .withMessage('Price per day is required'),
     handleValidationErrors
@@ -139,6 +141,7 @@ router.post(
         const { user } = req
         // console.log(address)
         const newSpot = await Spots.create({
+            ownerId: user.id,
             address: address,
             city: city,
             state: state,
@@ -148,7 +151,6 @@ router.post(
             name: name,
             description: description,
             price: price,
-            ownerId: user.id
         })
         // console.log('newspot:', newSpot)
         await newSpot.save()
@@ -197,24 +199,31 @@ router.post(
             let newBookingStartDate = new Date(startDate)
             let newBookingEndDate = new Date(endDate)
 
+            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate ||
+                newBookingStartDate > bookingStartDate && newBookingEndDate < bookingEndDate) {
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = {
+                    startDate: "Start date conflicts with an existing booking",
+                    endDate: "End date conflicts with an existing booking"
+                }
+                err.status = 403
+                return next(err)
+            }
 
             if (newBookingStartDate >= bookingStartDate && newBookingStartDate <= bookingEndDate) {
-                const err = new Error("conflict in booking")
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { startDate: "Start date conflicts with an existing booking" }
                 err.status = 403
                 return next(err)
             }
 
             if (newBookingEndDate >= bookingStartDate && newBookingEndDate <= bookingEndDate) {
-                const err = new Error("conflict in booking")
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { endDate: "End date conflicts with an existing booking" }
                 err.status = 403
                 return next(err)
             }
 
-            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate) {
-                const err = new Error("conflict in booking")
-                err.status = 403
-                return next(err)
-            }
 
         }
         // console.log(spotBookings)
@@ -431,7 +440,7 @@ router.get(
                 attributes: ['url']
             })
             if (preImage.length > 0) {
-                ele.dataValues.previewImage = preImage[0]
+                ele.dataValues.previewImage = preImage[0].url
             }
             // console.log('ele:', ele)
         }
@@ -577,14 +586,22 @@ router.get(
         }
         for (let i = 0; i < spotReviews.length; i++) {
             const ele = spotReviews[i];
-            console.log(ele)
+            // console.log(ele)
             const reviewUser = await User.findByPk(ele.userId, {
                 attributes: ['id', 'firstName', 'lastName']
             })
-            const reviewImage = await ReviewImages.findByPk(ele.id)
+            const reviewImage = await ReviewImages.findAll({
+                where: {
+                    reviewId: ele.id
+                },
+                attributes: ['id', 'url']
+            })
+
+            console.log(reviewImage)
+
             ele.dataValues.User = reviewUser
             if (reviewImage !== null) {
-                ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+                ele.dataValues.ReviewImages = reviewImage
             }// console.log('ele:', ele)
             spotResponse.Review.push(ele)
         }
@@ -596,7 +613,7 @@ router.get(
     '/:spotId',
     async (req, res, next) => {
         const { spotId } = req.params
-        const spot = await Spots.findByPk(spotId, {
+        const spot = await Spots.unscoped().findByPk(spotId, {
             include: {
                 model: User,
                 as: 'Owner',
