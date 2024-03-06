@@ -18,6 +18,7 @@ const reviewValidation = [
         .withMessage("Review Text is Required"),
     check('stars')
         .isInt({ min: 1, max: 5 })
+        .withMessage("Stars must be an integer from 1 to 5")
         .exists({ checkFalsy: true })
         .withMessage("Stars must be an integer from 1 to 5"),
     handleValidationErrors
@@ -30,10 +31,19 @@ router.delete(
     async (req, res, next) => {
         const { reviewId } = req.params
         const deleteReview = await Reviews.findByPk(reviewId)
+
         // console.log(deleteReview)
         if (deleteReview === null) {
             const err = new Error("review couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        const { user } = req
+        const userId = user.id
+        if (deleteReview.userId !== userId) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -57,6 +67,14 @@ router.put(
         if (updateReview === null) {
             const err = new Error("review couldn't be found")
             err.status = 404
+            return next(err)
+        }
+
+        const { user } = req
+        const userId = user.id
+        if (updateReview.userId !== userId) {
+            const err = new Error("Forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -87,13 +105,21 @@ router.post(
             return next(err)
         }
 
+        const { user } = req
+        const userId = user.id
+        if (reviewExists.userId !== userId) {
+            const err = new Error("Forbidden")
+            err.status = 403
+            return next(err)
+        }
+
         const numberImages = await ReviewImages.count({
             where: {
                 reviewId: reviewId
             }
         })
         console.log('# of images:', numberImages)
-        if (numberImages > 10) {
+        if (numberImages >= 10) {
             const err = new Error("Maximum number of images for this resource was reached")
             err.status = 403
             return next(err)
@@ -104,7 +130,7 @@ router.post(
             url: url
         })
         await newReviewImage.save()
-        newReviewResponse.Id = newReviewImage.id
+        newReviewResponse.id = newReviewImage.id
         newReviewResponse.url = url
         res.status(200)
         res.json(newReviewResponse)
@@ -116,7 +142,7 @@ router.get(
     requireAuth,
     async (req, res) => {
         const { user } = req
-        const reviewResponse = {}
+        const reviewResponse = { Review: [] }
         const userReviews = await Reviews.findAll({
             where: {
                 userId: user.id
@@ -127,13 +153,32 @@ router.get(
         })
         for (let i = 0; i < userReviews.length; i++) {
             const ele = userReviews[i];
-            const reviewSpot = await Spots.findByPk(ele.spotId)
-            const reviewImage = await ReviewImages.findByPk(ele.id)
+            const reviewSpot = await Spots.findByPk(ele.spotId, {
+                attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'price']
+            })
+            const reviewSpotPreview = await SpotImages.findAll({
+                where: { spotId: reviewSpot.id, preview: true },
+                attributes: ['url']
+            })
+
+            console.log(reviewSpotPreview[0])
+
+            reviewSpot.dataValues.previewImage = reviewSpotPreview[0].url
+
+            console.log('spot info:', reviewSpot)
+
+            const reviewImage = await ReviewImages.findAll({
+                where: { reviewId: ele.id },
+                attributes: ['id', 'url']
+            })
+            // console.log('these are the images:', reviewImage)
             ele.dataValues.User = reviewUser
             ele.dataValues.Spot = reviewSpot
-            ele.dataValues.ReviewImages = { id: reviewImage.id, url: reviewImage.url }
+            if (reviewImage !== null) {
+                ele.dataValues.ReviewImages = reviewImage
+            }
             // console.log(ele)
-            reviewResponse.Review = ele
+            reviewResponse.Review.push(ele)
         }
         // console.log(userReviews)
         res.json(reviewResponse)

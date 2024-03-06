@@ -21,12 +21,6 @@ router.delete(
 
         const deleteBooking = await Bookings.findByPk(bookingId)
 
-        if (deleteBooking.userId !== user.id) {
-            const err = new Error("you do not own the booking")
-            err.status = 400
-            return next(err)
-        }
-
         if (deleteBooking === null) {
             const err = new Error("Booking couldn't be found")
             err.status = 404
@@ -35,6 +29,13 @@ router.delete(
 
         if (new Date(deleteBooking.startDate) < new Date()) {
             const err = new Error("Bookings that have been started can't be deleted")
+            err.status = 403
+            return next(err)
+        }
+
+        const userId = user.id
+        if (deleteBooking.userId !== userId) {
+            const err = new Error("Forbidden")
             err.status = 403
             return next(err)
         }
@@ -69,15 +70,14 @@ router.put(
         }
 
         if (new Date(startDate) >= new Date(endDate)) {
-            const err = new Error('Bad request')
-            err.error = "endDate cannot be on or before startDate"
+            const err = new Error("endDate cannot be on or before startDate")
             err.status = 404
             return next(err)
         }
-
-        if (editBooking.userId !== user.id) {
-            const err = new Error("you do not own the booking")
-            err.status = 400
+        const userId = user.id
+        if (editBooking.userId !== userId) {
+            const err = new Error("forbidden")
+            err.status = 403
             return next(err)
         }
 
@@ -93,18 +93,40 @@ router.put(
         })
         // console.log(spotBookings)
 
-        spotBookings.forEach(ele => {
+        for (let i = 0; i < spotBookings.length; i++) {
+            const ele = spotBookings[i];
             let bookingStartDate = new Date(ele.startDate)
             let bookingEndDate = new Date(ele.endDate)
             let newBookingStartDate = new Date(startDate)
             let newBookingEndDate = new Date(endDate)
-            if (newBookingStartDate <= bookingStartDate && newBookingEndDate >= bookingStartDate ||
-                newBookingStartDate <= bookingEndDate && newBookingEndDate >= bookingEndDate) {
-                const err = new Error("conflict in booking")
+
+
+            if (newBookingStartDate < bookingStartDate && newBookingEndDate > bookingEndDate ||
+                newBookingStartDate > bookingStartDate && newBookingEndDate < bookingEndDate) {
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = {
+                    startDate: "Start date conflicts with an existing booking",
+                    endDate: "End date conflicts with an existing booking"
+                }
                 err.status = 403
                 return next(err)
             }
-        });
+
+            if (newBookingStartDate >= bookingStartDate && newBookingStartDate <= bookingEndDate) {
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { startDate: "Start date conflicts with an existing booking" }
+                err.status = 403
+                return next(err)
+            }
+
+            if (newBookingEndDate >= bookingStartDate && newBookingEndDate <= bookingEndDate) {
+                const err = new Error("Sorry, this spot is already booked for the specified dates")
+                err.errors = { endDate: "End date conflicts with an existing booking" }
+                err.status = 403
+                return next(err)
+            }
+
+        }
 
         editBooking.set({
             startDate: startDate,
@@ -130,6 +152,7 @@ router.get(
             },
             include: [{
                 model: Spots,
+                attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'price']
             }]
         })
         for (let i = 0; i < userBookings.length; i++) {

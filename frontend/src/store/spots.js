@@ -7,10 +7,11 @@ const loadSpots = spots => ({
 
 export const getSpots = () => async dispatch => {
     const response = await fetch('/api/spots')
-    console.log(response)
+    // console.log("this is the response:", response)
     if (response.ok) {
         const spots = await response.json()
-        dispatch(loadSpots(spots))
+        // console.log("this is the spots in the if block:", spots)
+        dispatch(loadSpots(spots.Spots))
         return spots
     }
 }
