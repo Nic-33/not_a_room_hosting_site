@@ -5,6 +5,8 @@ import * as sessionActions from '../../store/session';
 import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
+import { NavLink } from 'react-router-dom';
+
 
 function ProfileButton({ user }) {
     const dispatch = useDispatch();
@@ -48,6 +50,12 @@ function ProfileButton({ user }) {
                         <li>{user.username}</li>
                         <li>{user.firstName} {user.lastName}</li>
                         <li>{user.email}</li>
+                        <li>
+                        <NavLink key='manageSpot' to={'/spots/current'}>Manage Spots</NavLink>
+                        </li>
+                        <li>
+                        <NavLink key='manageReviews' to={'/reviews/current'}>Manage Reviews</NavLink>
+                        </li>
                         <li>
                             <button onClick={logout}>Log Out</button>
                         </li>
