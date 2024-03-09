@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { createSpot } from "../../store/spots";
+import { useNavigate, useParams } from "react-router-dom";
+import { updateSpot } from "../../store/spots";
+import { getSpot } from "../../store/spots";
 
 const UpdateSpotForm = () => {
+    const { spotId } = useParams()
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const [address, setAddress] = useState('')
-    const [city, setCity] = useState('')
-    const [state, setState] = useState('')
-    const [country, setCountry] = useState('')
-    const [lat, setLat] = useState()
-    const [lng, setLng] = useState()
-    const [name, setName] = useState()
-    const [description, setDescription] = useState('')
-    const [price, setPrice] = useState('')
+    const spot = useSelector((state) => state.spots)
+    const [address, setAddress] = useState(spot.address)
+    const [city, setCity] = useState(spot.city)
+    const [state, setState] = useState(spot.state)
+    const [country, setCountry] = useState(spot.country)
+    const [lat, setLat] = useState(spot.lat)
+    const [lng, setLng] = useState(spot.lng)
+    const [name, setName] = useState(spot.name)
+    const [description, setDescription] = useState(spot.description)
+    const [price, setPrice] = useState(spot.price)
 
     const updateAddress = (e) => setAddress(e.target.value)
     const updateCity = (e) => setCity(e.target.value)
@@ -41,10 +44,15 @@ const UpdateSpotForm = () => {
         }
 
         if (createSpotInfo) {
-            dispatch(createSpot(createSpotInfo))
-            navigate(`/`)
+            dispatch(updateSpot(createSpotInfo, spotId))
+            navigate(`/spots/current`)
         }
     }
+
+    useEffect(() => {
+        dispatch(getSpot(spotId))
+    }, [dispatch, spotId])
+
     return (
         <section className="new-form-holder centered middled">
             <form className="create-spot-form" onSubmit={handleSubmit}>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink, useNavigate, useParams, } from "react-router-dom";
 import { getSpots, deleteSpot } from "../../store/spots.js";
+import UpdateSpotForm from "../UpdateSpotForm/UpdateSpotForm.jsx";
 
 
 const ManageSpot = () => {
@@ -20,6 +21,10 @@ const ManageSpot = () => {
         dispatch(getSpots())
     }, [dispatch])
 
+    const UpdateSpotForm = async (e) => {
+        navigate(`/spots/${e}/edit`)
+    }
+
     const delSpot = async (e) => {
         console.log('eeeee', e)
         dispatch(deleteSpot(e))
@@ -35,7 +40,7 @@ const ManageSpot = () => {
                         {details.price}
                     </ul>
                     <ul>
-                        <button>Update</button>
+                        <button onClick={() => UpdateSpotForm(details.id)}>Update</button>
                         <button onClick={() => delSpot(details.id)} value={details.id}>Delete</button>
                     </ul>
                 </>

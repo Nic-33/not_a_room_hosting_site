@@ -651,6 +651,7 @@ router.get(
             country: spot.country,
             lat: spot.lat,
             lng: spot.lng,
+            name: spot.name,
             description: spot.description,
             price: spot.price,
             createdAt: spot.createdAt,

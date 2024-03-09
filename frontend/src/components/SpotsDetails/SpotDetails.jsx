@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { NavLink, useParams, } from "react-router-dom";
 import { getSpots } from "../../store/spots.js";
 import { getReview } from "../../store/review.js";
+import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
+import CreateReviewModal from "../CreateReviewModal/CreateReviewModal.jsx";
 
 const Spots = () => {
     const dispatch = useDispatch();
@@ -32,6 +34,12 @@ const Spots = () => {
                 {spotDetails.price}
             </ul>
         </ol>
+<ul>
+    <OpenModalButton
+    buttonText='Create Review'
+    modalComponent={<CreateReviewModal props={spotId} />}
+    />
+</ul>
         <ul>
             {reviews.map((review) => {
                 return (<>

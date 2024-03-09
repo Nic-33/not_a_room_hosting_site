@@ -161,11 +161,11 @@ router.get(
                 attributes: ['url']
             })
 
-            console.log(reviewSpotPreview[0])
+            // console.log(reviewSpotPreview[0])
 
             reviewSpot.dataValues.previewImage = reviewSpotPreview[0].url
 
-            console.log('spot info:', reviewSpot)
+            // console.log('spot info:', reviewSpot)
 
             const reviewImage = await ReviewImages.findAll({
                 where: { reviewId: ele.id },

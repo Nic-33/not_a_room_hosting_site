@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { NavLink, useNavigate, useParams, } from "react-router-dom";
 import { deleteReview, getUserReview } from "../../store/review.js";
+import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
+import UpdateReviewModal from "../UpdateReviewModal/UpdateReviewModal.jsx";
 
 const ManageReviews = () => {
-    const navigate = useNavigate
     const dispatch = useDispatch();
-    const sessionId = useSelector(state => state.session.user.id)
     const spotReviews = useSelector(state => state.review)
     const reviews = Object.values(spotReviews)
-    console.log('manageReviews', reviews)
+    // console.log('manageReviews', reviews)
 
 
     useEffect(() => {
@@ -17,7 +16,7 @@ const ManageReviews = () => {
     }, [dispatch])
 
     const delReview = async (e) => {
-        console.log('eeeee', e)
+        // console.log('eeeee', e)
         dispatch(deleteReview(e))
         window.location.reload(false)
     }
@@ -26,11 +25,20 @@ const ManageReviews = () => {
         <ol>
             {reviews.map((details) => {
                 return (<>
+                    <ul>
+                        {details.Spot.name}
+                    </ul>
                     < ul >
                         {details.review}
                     </ul>
                     <ul>
-                        <button>Update</button>
+                        {details.stars}
+                    </ul>
+                    <ul>
+                        <OpenModalButton
+                            buttonText='Update'
+                            modalComponent={<UpdateReviewModal props={{ reviewId: details.id, spotId: details.Spot.id }} />}
+                        />
                         <button onClick={() => delReview(details.id)} value={details.id}>Delete</button>
                     </ul>
                 </>
