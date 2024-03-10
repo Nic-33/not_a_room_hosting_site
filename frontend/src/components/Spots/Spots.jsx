@@ -8,7 +8,7 @@ const Spots = () => {
     const { spotId } = useParams()
     const allSpots = useSelector((state) => state.spots)
     const spots = Object.values(allSpots)
-    // console.log(spots)
+    console.log(spots)
     // const spot = allSpots.list.map(spotId => allSpots[spotId])
 
     useEffect(() => {
@@ -20,7 +20,11 @@ const Spots = () => {
             {spots.map((spot) => {
                 return (
                     <ol>
+                        <div>
+                        <img src="" alt="" />
                         <NavLink key={spot.name} to={`/${spot.id}`}>{spot.name}</NavLink>
+
+                        </div>
                     </ol>
                 )
             })}
