@@ -18,12 +18,13 @@ const Spots = () => {
     return (
         <li>
             {spots.map((spot) => {
+                console.log('spot.previewimage:', spot.previewImage)
                 return (
                     <ol>
                         <div>
-                        <img src="" alt="" />
+                        <img src={spot.previewImage} alt={spot.name} />
                         <NavLink key={spot.name} to={`/${spot.id}`}>{spot.name}</NavLink>
-
+<div>${spot.price} per night</div>
                         </div>
                     </ol>
                 )
