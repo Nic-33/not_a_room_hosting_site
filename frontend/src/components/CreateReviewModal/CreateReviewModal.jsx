@@ -33,7 +33,7 @@ function CreateReviewModal(spotId) {
             <form onSubmit={handleSubmit}>
                 <label>
                     Username or Email
-                    <input
+                    <textarea
                         type="text"
                         value={review}
                         onChange={(e) => setReview(e.target.value)}

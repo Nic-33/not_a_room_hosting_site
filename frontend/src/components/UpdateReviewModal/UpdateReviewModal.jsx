@@ -16,11 +16,14 @@ function UpdateReviewModal(props) {
     // console.log('update review: ', updateReview)
     const [review, setReview] = useState(updateReview.review);
     const [stars, setStars] = useState(updateReview.stars);
+    const [loaded, setLoaded] = useState(false)
+
     const { closeModal } = useModal();
     console.log('stars:', stars)
 
     useEffect(() => {
         dispatch(getReview(spotId))
+            .then(() => setLoaded(true))
     }, [dispatch, spotId])
 
     const handleSubmit = (e) => {
@@ -39,28 +42,30 @@ function UpdateReviewModal(props) {
 
     return (
         <>
-            <h1>Update Review</h1>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Username or Email
-                    <input
-                        type="text"
-                        value={review}
-                        onChange={(e) => setReview(e.target.value)}
-                        required
-                    />
-                </label>
-                <label>
-                    Password
-                    <input
-                        type="number"
-                        value={stars}
-                        onChange={(e) => setStars(e.target.value)}
-                        required
-                    />
-                </label>
-                <button type="submit">Submit</button>
-            </form>
+            {loaded && <div>
+                <h1>Update Review</h1>
+                <form onSubmit={handleSubmit}>
+                    <label>
+                        Username or Email
+                        <textarea
+                            type="text"
+                            value={review}
+                            onChange={(e) => setReview(e.target.value)}
+                            required
+                        />
+                    </label>
+                    <label>
+                        Password
+                        <input
+                            type="number"
+                            value={stars}
+                            onChange={(e) => setStars(e.target.value)}
+                            required
+                        />
+                    </label>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>}
         </>
     );
 }

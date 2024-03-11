@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteReview, getUserReview } from "../../store/review.js";
 import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
@@ -8,11 +8,14 @@ const ManageReviews = () => {
     const dispatch = useDispatch();
     const spotReviews = useSelector(state => state.review)
     const reviews = Object.values(spotReviews)
+    const [loaded, setLoaded] = useState(false)
+
     // console.log('manageReviews', reviews)
 
 
     useEffect(() => {
         dispatch(getUserReview())
+            .then(() => setLoaded(true))
     }, [dispatch])
 
     const delReview = async (e) => {
@@ -21,7 +24,9 @@ const ManageReviews = () => {
         window.location.reload(false)
     }
 
-    return (<>
+    return (
+        <>
+        {loaded && <div>
         <ol>
             {reviews.map((details) => {
                 return (<>
@@ -45,6 +50,7 @@ const ManageReviews = () => {
                 )
             })}
         </ol >
+    </div>}
     </>
     );
 }

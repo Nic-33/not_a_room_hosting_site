@@ -48,7 +48,6 @@ export const getUserReview = () => async dispatch => {
         const review = await response.json()
         // console.log("this is the reviews in the if block:", review)
         dispatch(loadReview(review.Review))
-        return review
     }
 }
 

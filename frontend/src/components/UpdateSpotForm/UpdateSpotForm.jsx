@@ -18,6 +18,8 @@ const UpdateSpotForm = () => {
     const [name, setName] = useState(spot.name)
     const [description, setDescription] = useState(spot.description)
     const [price, setPrice] = useState(spot.price)
+    const [loaded, setLoaded] = useState(false)
+
 
     const updateAddress = (e) => setAddress(e.target.value)
     const updateCity = (e) => setCity(e.target.value)
@@ -51,68 +53,71 @@ const UpdateSpotForm = () => {
 
     useEffect(() => {
         dispatch(getSpot(spotId))
+            .then(() => setLoaded(true))
     }, [dispatch, spotId])
 
     return (
-        <section className="new-form-holder centered middled">
-            <form className="create-spot-form" onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Address"
-                    required
-                    value={address}
-                    onChange={updateAddress} />
-                <input
-                    type="text"
-                    placeholder="City"
-                    required
-                    value={city}
-                    onChange={updateCity} />
-                <input
-                    type="text"
-                    placeholder="State"
-                    required
-                    value={state}
-                    onChange={updateState} />
-                <input
-                    type="text"
-                    placeholder="Country"
-                    required
-                    value={country}
-                    onChange={updateCountry} />
-                <input
-                    type="number"
-                    placeholder="Latitude"
-                    value={lat}
-                    onChange={updateLat} />
-                <input
-                    type="number"
-                    placeholder="longitude"
-                    value={lng}
-                    onChange={updateLng} />
-                <input
-                    type="text"
-                    placeholder="Name of Spot"
-                    required
-                    value={name}
-                    onChange={updateName} />
-                <input
-                    type="text"
-                    placeholder="Description"
-                    required
-                    value={description}
-                    onChange={updateDescription} />
-                <input
-                    type="text"
-                    placeholder="price"
-                    required
-                    value={price}
-                    onChange={updatePrice} />
+        <>{loaded && <div>
+            <section className="new-form-holder centered middled">
+                <form className="create-spot-form" onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Address"
+                        required
+                        value={address}
+                        onChange={updateAddress} />
+                    <input
+                        type="text"
+                        placeholder="City"
+                        required
+                        value={city}
+                        onChange={updateCity} />
+                    <input
+                        type="text"
+                        placeholder="State"
+                        required
+                        value={state}
+                        onChange={updateState} />
+                    <input
+                        type="text"
+                        placeholder="Country"
+                        required
+                        value={country}
+                        onChange={updateCountry} />
+                    <input
+                        type="number"
+                        placeholder="Latitude"
+                        value={lat}
+                        onChange={updateLat} />
+                    <input
+                        type="number"
+                        placeholder="longitude"
+                        value={lng}
+                        onChange={updateLng} />
+                    <input
+                        type="text"
+                        placeholder="Name of Spot"
+                        required
+                        value={name}
+                        onChange={updateName} />
+                    <textarea
+                        type="text"
+                        placeholder="Description"
+                        required
+                        value={description}
+                        onChange={updateDescription} />
+                    <input
+                        type="text"
+                        placeholder="price"
+                        required
+                        value={price}
+                        onChange={updatePrice} />
 
-                <button type="submit">Update Spot</button>
-                <button>Cancel</button>
-            </form>
-        </section>
+                    <button type="submit">Update Spot</button>
+                    <button>Cancel</button>
+                </form>
+            </section>
+        </div>}</>
     );
 };
 

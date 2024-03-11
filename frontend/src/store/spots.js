@@ -49,8 +49,10 @@ export const createSpot = (payload) => async dispatch => {
         body: JSON.stringify(payload)
     })
     if (res.ok) {
-        const spot = await res.json()
-        dispatch(CreateSPOT(spot))
+        const spots = await res.json()
+        console.log('res:', spots)
+        dispatch(CreateSPOT(spots))
+        return spots
     }
 }
 
@@ -64,8 +66,8 @@ export const getSpot = (spotId) => async dispatch => {
 }
 
 export const updateSpot = (payload, spotId) => async dispatch => {
-    const res = await csrfFetch(`/api/spots/${spotId}`,{
-        method:'PUT',
+    const res = await csrfFetch(`/api/spots/${spotId}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -82,7 +84,7 @@ const initialState = {}
 const spotsReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_ALL_SPOTS: {
-            const allSpots = { ...state }
+            const allSpots = {}
             console.log('action spot:', action)
             action.spots.forEach(spot => (allSpots[spot.id] = spot));
             return allSpots
