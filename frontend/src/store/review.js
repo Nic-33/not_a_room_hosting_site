@@ -31,7 +31,7 @@ export const updateReview = review => ({
 
 
 export const getReview = (spotId) => async dispatch => {
-    console.log('review spot id:', spotId)
+    // console.log('review spot id:', spotId)
     const response = await fetch(`/api/spots/${spotId}/reviews`)
     // console.log("this is the response:", response)
     if (response.ok) {
@@ -52,8 +52,8 @@ export const getUserReview = () => async dispatch => {
 }
 
 export const createNewReview = (payload, spotId) => async dispatch => {
-    console.log(spotId)
-    const response = await csrfFetch(`/api/spots/${spotId.props}/reviews`, {
+    // console.log('spotId inside createReiview', spotId)
+    const response = await csrfFetch(`/api/spots/${spotId}/reviews`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const reviewReducer = (state = initialState, action) => {
             return newState;
         }
         case GET_REVIEW_FOR_USER: {
-            const newState = {};
+            const newState = { ...state };
             // console.log('action review:', newState)
             action.review.forEach(review => (newState[review.id] = review))
             return newState;
@@ -107,6 +107,16 @@ const reviewReducer = (state = initialState, action) => {
                     review: [...state[action.review.Id].review, action.review.id]
                 }
             }
+        }
+        case UPDATE_REVIEW: {
+            return {
+                ...state,
+                [action.review.Id]: {
+                    ...state[action.review.Id],
+                    review: [...state[action.review.Id].review, action.review.id]
+                }
+            }
+
         }
         default:
             return state

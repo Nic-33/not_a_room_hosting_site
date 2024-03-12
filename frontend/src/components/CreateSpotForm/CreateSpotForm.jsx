@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSpot } from "../../store/spots";
 import { createNewSpotImages } from "../../store/spotImages";
+import '../../index.css'
 
 const CreateSpotForm = () => {
     const dispatch = useDispatch()
@@ -17,7 +18,7 @@ const CreateSpotForm = () => {
     const [description, setDescription] = useState('')
     const [price, setPrice] = useState('')
     const [previewImage, setPreviewImage] = useState('')
-    const [image1, setImage1] = useState([])
+    const [image1, setImage1] = useState('')
     const [image2, setImage2] = useState('')
     const [image3, setImage3] = useState('')
     const [image4, setImage4] = useState('')
@@ -53,7 +54,7 @@ const CreateSpotForm = () => {
 
 
         if (createSpotInfo) {
-            let spot = dispatch(createSpot(createSpotInfo))
+            let spot = await dispatch(createSpot(createSpotInfo))
             console.log('spot inside createspot:', spot)
             if (previewImage.length) {
                 dispatch(createNewSpotImages({ url: previewImage, preview: true }, spot.id))
@@ -70,90 +71,118 @@ const CreateSpotForm = () => {
             if (image4.length) {
                 dispatch(createNewSpotImages({ url: image4, preview: false }, spot.id))
             }
-            navigate(`/`)
+            navigate(`/${spot.id}`)
         }
     }
     return (
-        <section className="new-form-holder centered middled">
+        <section className="new-Spot-Form">
+            <h1>Create a new Spot</h1>
+            <h2>Where's your place Located</h2>
+            <h3>Guests will only get your exact address once they booked a reservation.</h3>
             <form className="create-spot-form" onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Address"
-                    required
-                    value={address}
-                    onChange={updateAddress} />
-                <input
-                    type="text"
-                    placeholder="City"
-                    required
-                    value={city}
-                    onChange={updateCity} />
-                <input
-                    type="text"
-                    placeholder="State"
-                    required
-                    value={state}
-                    onChange={updateState} />
-                <input
-                    type="text"
-                    placeholder="Country"
-                    required
-                    value={country}
-                    onChange={updateCountry} />
-                <input
-                    type="number"
-                    placeholder="Latitude"
-                    value={lat}
-                    onChange={updateLat} />
-                <input
-                    type="number"
-                    placeholder="longitude"
-                    value={lng}
-                    onChange={updateLng} />
-                <input
-                    type="text"
-                    placeholder="Name of Spot"
-                    required
-                    value={name}
-                    onChange={updateName} />
-                <textarea
-                    type="text"
-                    placeholder="Description"
-                    required
-                    value={description}
-                    onChange={updateDescription} />
-                <input
-                    type="text"
-                    placeholder="price"
-                    required
-                    value={price}
-                    onChange={updatePrice} />
-                <input
-                    type="text"
-                    placeholder="Preview Image URL"
-                    required
-                    value={previewImage}
-                    onChange={updatePreviewImage} />
-                <input
-                    type="text"
-                    placeholder="Image URL"
-                    value={image1}
-                    onChange={updateImage1} />
-                <input
-                    type="text"
-                    placeholder="Image URL"
-                    value={image2}
-                    onChange={updateImage2} />
-                <input
-                    type="text"
-                    placeholder="Image URL"
-                    value={image3}
-                    onChange={updateImage3} />
-                <input
-                    type="text"
-                    placeholder="Image URL"
-                    value={image4}
-                    onChange={updateImage4} />
+                <div id='addressBlock'>
+                    <h3>Country</h3>
+                    <input
+                        type="text"
+                        placeholder="Country"
+                        required
+                        value={country}
+                        onChange={updateCountry} />
+                    <h3>Street Address</h3>
+                    <input
+                        type="text"
+                        placeholder="Address"
+                        required
+                        value={address}
+                        onChange={updateAddress} />
+                    <h3>City</h3>
+                    <input
+                        type="text"
+                        placeholder="City"
+                        required
+                        value={city}
+                        onChange={updateCity} />
+                    <h3>State</h3>
+                    <input
+                        type="text"
+                        placeholder="State"
+                        required
+                        value={state}
+                        onChange={updateState} />
+                    <h3>Latitude</h3>
+                    <input
+                        type="number"
+                        placeholder="Latitude"
+                        value={lat}
+                        onChange={updateLat} />
+                    <h3>Longitude</h3>
+                    <input
+                        type="number"
+                        placeholder="longitude"
+                        value={lng}
+                        onChange={updateLng} />
+                </div>
+                <div id='descriptionBlock'>
+                    <h2>Describe your place to Guests</h2>
+                    <h3>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood.</h3>
+                    <textarea
+                        type="text"
+                        placeholder="Description"
+                        required
+                        value={description}
+                        onChange={updateDescription} />
+                </div>
+                <div id='spotNameBlock'>
+                    <h2>Create a title for your spot</h2>
+                    <h3>Catch guests attention with a spot title that highlights what makes your place special</h3>
+                    <input
+                        type="text"
+                        placeholder="Name of Spot"
+                        required
+                        value={name}
+                        onChange={updateName} />
+                </div>
+                <div id='spotPrice'>
+                    <h2>Set a base price for your spot</h2>
+                    <h3>competitive pricing can help your listing stand out and rank higher in search results</h3>
+                    <h4>$</h4>
+                    <input
+                        type="text"
+                        placeholder="price"
+                        required
+                        value={price}
+                        onChange={updatePrice} />
+                </div>
+                <div id='imageBlock'>
+                    <h2>Liven up your spot with photos</h2>
+                    <h3>Submit a link to at least one photo to publish your spot</h3>
+                    <input
+                        type="text"
+                        placeholder="Preview Image URL"
+                        required
+                        value={previewImage}
+                        onChange={updatePreviewImage} />
+                    <input
+                        type="text"
+                        placeholder="Image URL"
+                        value={image1}
+                        onChange={updateImage1} />
+                    <input
+                        type="text"
+                        placeholder="Image URL"
+                        value={image2}
+                        onChange={updateImage2} />
+                    <input
+                        type="text"
+                        placeholder="Image URL"
+                        value={image3}
+                        onChange={updateImage3} />
+                    <input
+                        type="text"
+                        placeholder="Image URL"
+                        value={image4}
+                        onChange={updateImage4} />
+                </div>
                 <button type="submit">Create new Spot</button>
             </form>
         </section>

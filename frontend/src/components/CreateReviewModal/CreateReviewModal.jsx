@@ -1,17 +1,14 @@
-import { useEffect, useState } from 'react';
-import * as sessionActions from '../../store/session';
-import { useDispatch, useSelector } from 'react-redux';
-import { useModal } from '../../context/Modal';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { createNewReview } from '../../store/review';
-import { useNavigate } from 'react-router-dom';
-// import './LoginForm.css';
+import './CreateReviewModal.css';
+import '../../index.css'
 
-function CreateReviewModal(spotId) {
+function CreateReviewModal(props) {
+    const { spotId, name } = props.props
     const dispatch = useDispatch();
     const [review, setReview] = useState("");
     const [stars, setStars] = useState("");
-    const { closeModal } = useModal();
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -29,27 +26,32 @@ function CreateReviewModal(spotId) {
 
     return (
         <>
-            <h1>Submit Review</h1>
+            <h1>How was your stay at {name}</h1>
             <form onSubmit={handleSubmit}>
                 <label>
-                    Username or Email
                     <textarea
                         type="text"
+                        placeholder='Just a quick review'
                         value={review}
                         onChange={(e) => setReview(e.target.value)}
                         required
                     />
                 </label>
                 <label>
-                    Password
-                    <input
-                        type="number"
-                        value={stars}
-                        onChange={(e) => setStars(e.target.value)}
-                        required
-                    />
+                    <div className="rate">
+                        <input type="radio" id="star5" name="rate" value="5" onClick={(e) => setStars(e.target.value)} />
+                        <label htmlFor="star5" title="text"></label>
+                        <input type="radio" id="star4" name="rate" value="4" onClick={(e) => setStars(e.target.value)} />
+                        <label htmlFor="star4" title="text"></label>
+                        <input type="radio" id="star3" name="rate" value="3" onClick={(e) => setStars(e.target.value)} />
+                        <label htmlFor="star3" title="text"></label>
+                        <input type="radio" id="star2" name="rate" value="2" onClick={(e) => setStars(e.target.value)} />
+                        <label htmlFor="star2" title="text"></label>
+                        <input type="radio" id="star1" name="rate" value="1" onClick={(e) => setStars(e.target.value)} />
+                        <label htmlFor="star1" title="text"></label>
+                    </div>
                 </label>
-                <button type="submit">Submit</button>
+                <button id='pointer' type="submit">Submit Your Review</button>
             </form>
         </>
     );

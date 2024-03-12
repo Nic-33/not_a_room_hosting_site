@@ -15,7 +15,8 @@ export const updateReview = images => ({
 
 
 export const createNewSpotImages = (payload, spotId) => async dispatch => {
-    console.log(spotId)
+    console.log('image spotID:', spotId)
+    console.log('imagepayload:', payload)
     const response = await csrfFetch(`/api/spots/${spotId}/images`, {
         method: 'POST',
         headers: {

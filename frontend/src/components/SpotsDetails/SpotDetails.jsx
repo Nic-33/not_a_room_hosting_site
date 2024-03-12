@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, } from "react-router-dom";
 import { getSpot } from "../../store/spots.js";
-import { getReview, deleteReview } from "../../store/review.js";
+import { getReview } from "../../store/review.js";
 import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
 import CreateReviewModal from "../CreateReviewModal/CreateReviewModal.jsx";
 import UpdateReviewModal from "../UpdateReviewModal/UpdateReviewModal.jsx";
-
+import ConfirmDeleteModal from "../ConfirmDeleteModal/ConfirmDeleteModal.jsx";
+import '../../index.css'
 
 const Spots = () => {
     const dispatch = useDispatch();
@@ -21,13 +22,19 @@ const Spots = () => {
     let comingSoon = () => alert("Feature coming soon")
 
     const numRev = reviews.length
-    let rating
-    if (numRev === 0) {
-        rating = 'New'
-    } else if (numRev === 1) {
-        rating = `${numRev} Review`
-    } else {
-        rating = `${numRev} Reviews`
+    let revRating = 'new'
+    if (numRev === 1) {
+        revRating = `${numRev} Review`
+    } else if (numRev > 1) {
+        revRating = `${numRev} Reviews`
+    }
+
+    const starRat = spotDetails.avgStarRating
+    let starRating
+    if (!starRat) {
+        starRating = 0
+    }else {
+        starRating = spotDetails.avgStarRating.toFixed(1)
     }
 
     useEffect(() => {
@@ -36,48 +43,40 @@ const Spots = () => {
             .then(() => setLoaded(true))
     }, [dispatch, spotId])
 
-    const delReview = async (e) => {
-        dispatch(deleteReview(e))
-        window.location.reload(false)
-    }
 
     return (<>
 
         {loaded && <div>
-            <ol>
-                {spotDetails.name}
-                <div>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}  </div>
-                {spotDetails.SpotImages.forEach((image) => (spotImages.push(image.url)))}
-                {spotImages.map((image) => {
-                    return (
-                        <>
-                            <img src={image} alt="image" />
-                        </>
-                    )
-                })}
-                {spotDetails.price}
-                <div>Hosted by {spotDetails.Owner.firstName} {spotDetails.Owner.lastName}</div>
-                <div>{spotDetails.description}</div>
-            </ol>
+            <div>{spotDetails.name}</div>
+            <div>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}  </div>
+            {spotDetails.SpotImages.forEach((image) => (spotImages.push(image.url)))}
+            {spotImages.map((image) => {
+                return (
+                    <>
+                        <img src={image} alt="image" />
+                    </>
+                )
+            })}
+            <div>Hosted by {spotDetails.Owner.firstName} {spotDetails.Owner.lastName}</div>
+            <div>{spotDetails.description}</div>
 
             <div className="reserve-container">
                 <div>${spotDetails.price} night</div>
-                <div>star {spotDetails.avgStarRating}</div>
-                <div>{rating}</div>
+                <div>star {starRating}</div>
+                <div>{revRating}</div>
                 <button onClick={comingSoon}>Reserve</button>
             </div>
 
             <ul hidden={session.user && spotDetails.ownerId === session.user.id}>
                 <OpenModalButton
-
                     buttonText='Create Review'
-                    modalComponent={<CreateReviewModal props={spotId} />}
+                    modalComponent={<CreateReviewModal props={{ spotId:spotId, name:spotDetails.name }} />}
                 />
             </ul>
             <ul>
                 <div className="reviews-container">
-                    <div>star {spotDetails.avgStarRating}</div>
-                    <div>{rating}</div>
+                    <div>star {starRating}</div>
+                    <div>{revRating}</div>
                     <span hidden={reviews.length !== 0 || (session.user && spotDetails.ownerId === session.user.id)}>Be the first to post a review!</span>
                     <div className="review-data">
                         {reviews && reviews.map((review) => {
@@ -93,7 +92,10 @@ const Spots = () => {
                                             buttonText='Update'
                                             modalComponent={<UpdateReviewModal props={{ reviewId: review.id, spotId: review.spotId }} />}
                                         />
-                                        <button onClick={() => delReview(review.id)} value={review.id}>Delete</button>
+                                        <OpenModalButton
+                                            buttonText='Delete'
+                                            modalComponent={<ConfirmDeleteModal props={{ tag: "review", id: review.id }} />}
+                                        />
                                     </ul>
                                 </div>
                             )

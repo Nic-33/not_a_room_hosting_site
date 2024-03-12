@@ -1,1 +1,9 @@
 /* TODO: Add sitewide styles */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#pointer {
+    cursor: pointer;
+}

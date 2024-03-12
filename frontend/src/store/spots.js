@@ -2,9 +2,9 @@ import { csrfFetch } from "./csrf"
 
 const GET_ALL_SPOTS = 'spots/getAllSpots'
 const CREATE_SPOT = 'spots/createSpot'
-const DELETE_SPOT = 'spots/deleteSpot'
 const GET_A_SPOT = 'spots/getASpot'
 const UPDATE_SPOT = 'spots/update'
+const USER_SPOTS = 'spots/userSpots'
 
 const loadSpots = spots => ({
     type: GET_ALL_SPOTS,
@@ -16,9 +16,6 @@ const CreateSPOT = spots => ({
     spots
 })
 
-const DeleteSpot = () => ({
-    type: DELETE_SPOT,
-})
 
 const loadASpot = spot => ({
     type: GET_A_SPOT,
@@ -30,6 +27,11 @@ const UpdateSpot = spot => ({
     spot
 })
 
+const UserSpots = spots => ({
+    type: USER_SPOTS,
+    spots
+})
+
 export const getSpots = () => async dispatch => {
     const response = await fetch('/api/spots')
     // console.log("this is the response:", response)
@@ -37,6 +39,16 @@ export const getSpots = () => async dispatch => {
         const spots = await response.json()
         console.log("this is the spots in the if block:", spots)
         dispatch(loadSpots(spots.Spots))
+    }
+}
+
+export const getUserSpots = () => async dispatch => {
+    const response = await fetch('/api/spots/current')
+    // console.log("this is the response:", response)
+    if (response.ok) {
+        const spots = await response.json()
+        console.log("this is the spots in the if block:", spots)
+        dispatch(UserSpots(spots.Spots))
     }
 }
 
@@ -52,6 +64,7 @@ export const createSpot = (payload) => async dispatch => {
         const spots = await res.json()
         console.log('res:', spots)
         dispatch(CreateSPOT(spots))
+        console.log('spots with in createspot store', spots)
         return spots
     }
 }
@@ -89,10 +102,12 @@ const spotsReducer = (state = initialState, action) => {
             action.spots.forEach(spot => (allSpots[spot.id] = spot));
             return allSpots
         }
+        case USER_SPOTS: {
+            const userSpot = {}
+            action.spots.forEach(spot => (userSpot[spot.id] = spot));
+            return userSpot
+        }
         case GET_A_SPOT: {
-            const allSpots = { ...state }
-            console.log('action spot:', action.spot)
-            // action.spot.forEach(spot => (allSpots[spot.id] = spot));
             return action.spot
         }
         case CREATE_SPOT: {
@@ -100,7 +115,7 @@ const spotsReducer = (state = initialState, action) => {
                 ...state,
                 [action.spots.Id]: {
                     ...state[action.spots.Id],
-                    spots: [...state[action.spots.Id].spots, action.spots.id]
+                    spots: [state[action.spots.Id], action.spots.id]
                 }
             }
         }

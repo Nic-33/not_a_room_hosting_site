@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import * as sessionActions from '../../store/session';
 // import './SignupForm.css';
+import '../../index.css'
 
 function SignupFormModal() {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ function SignupFormModal() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import * as sessionActions from '../../store/session';
 import { useDispatch, useSelector } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import { getReview, updateReviewInfo } from '../../store/review';
 // import './LoginForm.css';
+import '../../index.css'
 
 function UpdateReviewModal(props) {
-    const { reviewId, spotId } = props.props
+    const { reviewId, spotId, name } = props.props
     const dispatch = useDispatch();
     const reviews = useSelector(state => state.review)
     const reviewValues = Object.values(reviews)
-    // console.log('review object:', props)
-    // console.log('review id:', reviewId)
     const updateReview = reviewValues.find(({ id }) => id === reviewId)
-    // console.log('update review: ', updateReview)
     const [review, setReview] = useState(updateReview.review);
     const [stars, setStars] = useState(updateReview.stars);
     const [loaded, setLoaded] = useState(false)
@@ -43,27 +40,32 @@ function UpdateReviewModal(props) {
     return (
         <>
             {loaded && <div>
-                <h1>Update Review</h1>
+                <h1>How was your stay at {name}</h1>
                 <form onSubmit={handleSubmit}>
                     <label>
-                        Username or Email
                         <textarea
                             type="text"
+                            placeholder='Just a quick review'
                             value={review}
                             onChange={(e) => setReview(e.target.value)}
                             required
                         />
                     </label>
                     <label>
-                        Password
-                        <input
-                            type="number"
-                            value={stars}
-                            onChange={(e) => setStars(e.target.value)}
-                            required
-                        />
+                        <div className="rate">
+                            <input type="radio" id="star5" name="rate" value="5" onClick={(e) => setStars(e.target.value)} />
+                            <label htmlFor="star5" title="text"></label>
+                            <input type="radio" id="star4" name="rate" value="4" onClick={(e) => setStars(e.target.value)} />
+                            <label htmlFor="star4" title="text"></label>
+                            <input type="radio" id="star3" name="rate" value="3" onClick={(e) => setStars(e.target.value)} />
+                            <label htmlFor="star3" title="text"></label>
+                            <input type="radio" id="star2" name="rate" value="2" onClick={(e) => setStars(e.target.value)} />
+                            <label htmlFor="star2" title="text"></label>
+                            <input type="radio" id="star1" name="rate" value="1" onClick={(e) => setStars(e.target.value)} />
+                            <label htmlFor="star1" title="text"></label>
+                        </div>
                     </label>
-                    <button type="submit">Submit</button>
+                    <button type="submit">Update Your Review</button>
                 </form>
             </div>}
         </>
