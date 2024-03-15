@@ -151,8 +151,8 @@ router.get(
         const reviewUser = await User.findByPk(user.id, {
             attributes: ['id', 'firstName', 'lastName']
         })
-        for (let i = 0; i < userReviews.length; i++) {
-            const ele = userReviews[i];
+        for await (const ele of userReviews) {
+            // const ele = userReviews[i];
             const reviewSpot = await Spots.findByPk(ele.spotId, {
                 attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country', 'lat', 'lng', 'name', 'price']
             })

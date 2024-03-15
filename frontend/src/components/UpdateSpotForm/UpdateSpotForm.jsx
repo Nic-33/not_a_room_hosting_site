@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { updateSpot } from "../../store/spots";
 import { getSpot } from "../../store/spots";
+import './UpdateSpotForm.css'
 import '../../index.css'
 
 
@@ -12,22 +13,30 @@ const UpdateSpotForm = () => {
     const navigate = useNavigate()
     const spot = useSelector((state) => state.spots)
     const [loaded, setLoaded] = useState(false)
-    console.log('spot on updateform', spot)
+    // console.log('spot on updateform', spot)
 
-    const [address, setAddress] = useState(spot.address)
-    const [city, setCity] = useState(spot.city)
-    const [state, setState] = useState(spot.state)
-    const [country, setCountry] = useState(spot.country)
-    const [lat, setLat] = useState(spot.lat)
-    const [lng, setLng] = useState(spot.lng)
-    const [name, setName] = useState(spot.name)
-    const [description, setDescription] = useState(spot.description)
-    const [price, setPrice] = useState(spot.price)
+    const [address, setAddress] = useState()
+    const [city, setCity] = useState()
+    const [state, setState] = useState()
+    const [country, setCountry] = useState()
+    const [lat, setLat] = useState()
+    const [lng, setLng] = useState()
+    const [name, setName] = useState()
+    const [description, setDescription] = useState()
+    const [price, setPrice] = useState()
     const [previewImage, setPreviewImage] = useState()
     const [image1, setImage1] = useState()
     const [image2, setImage2] = useState()
     const [image3, setImage3] = useState()
     const [image4, setImage4] = useState()
+    const [addressError, setAddressError] = useState("hidden")
+    const [countryError, setCountryError] = useState("hidden")
+    const [cityError, setCityError] = useState("hidden")
+    const [stateError, setStateError] = useState("hidden")
+    const [descriptionError, setDescriptionError] = useState("hidden")
+    const [nameError, setNameError] = useState("hidden")
+    const [priceError, setPriceError] = useState("hidden")
+    const [previewError, setPreviewError] = useState("hidden")
 
     const updateAddress = (e) => setAddress(e.target.value)
     const updateCity = (e) => setCity(e.target.value)
@@ -58,133 +67,217 @@ const UpdateSpotForm = () => {
             price
         }
 
-        if (createSpotInfo) {
-            dispatch(updateSpot(createSpotInfo, spotId))
-            navigate(`/${spotId}`)
+        setAddressError("hidden")
+        setCityError("hidden")
+        setCountryError("hidden")
+        setDescriptionError("hidden")
+        setStateError("hidden")
+        setNameError("hidden")
+        setPriceError("hidden")
+        setPreviewError("hidden")
+
+        let error = true
+        if (address.length === 0) {
+            setAddressError('visible')
+            error = false
+        }
+        if (!(city)) {
+            setCityError('visible')
+            error = false
+        }
+        if (!(state)) {
+            setStateError('visible')
+            error = false
+        }
+        if (!(country) || country.length === 0) {
+            setCountryError('visible')
+            error = false
+        }
+        if (description.length < 1) {
+            setDescriptionError('visible')
+            error = false
+        }
+        if (!(name)) {
+            setNameError('visible')
+            error = false
+        }
+        if (!(price) || price < 1) {
+            setPriceError('visible')
+            error = false
+        }
+        if (!(previewImage) || previewImage.length === 0) {
+            setPreviewError('visible')
+            error = false
+        }
+
+
+        if (error) {
+            dispatch(updateSpot(createSpotInfo, spot.id))
+            navigate(`/${spot.id}`)
+        } else {
+            return
         }
     }
 
     useEffect(() => {
         dispatch(getSpot(spotId))
+            .then((e) => {
+                setCountry(e.country)
+                setAddress(e.address)
+                setCity(e.city)
+                setState(e.state)
+                setLat(e.lat)
+                setLng(e.lng)
+                setName(e.name)
+                setPrice(e.price)
+                setDescription(e.description)
+                setPreviewImage(e.SpotImages[0].url)
+            })
             .then(() => setLoaded(true))
     }, [dispatch, spotId])
 
 
     return (
-        <>{loaded && <div>
-            <section className="new-form-holder">
-                <h1>Update your Spot</h1>
-                <h2>Where's your place Located</h2>
-                <h3>Guests will only get your exact address once they booked a reservation.</h3>
-                <form className="update-spot-form" onSubmit={handleSubmit}>
-                    <div id='addressBlock'>
-                        <h3>Country</h3>
-                        <input
-                            type="text"
-                            placeholder="Country"
-                            required
-                            value={country}
-                            onChange={updateCountry} />
-                        <h3>Street Address</h3>
-                        <input
-                            type="text"
-                            placeholder="Address"
-                            required
-                            value={address}
-                            onChange={updateAddress} />
-                        <h3>City</h3>
-                        <input
-                            type="text"
-                            placeholder="City"
-                            required
-                            value={city}
-                            onChange={updateCity} />
-                        <h3>State</h3>
-                        <input
-                            type="text"
-                            placeholder="State"
-                            required
-                            value={state}
-                            onChange={updateState} />
-                        <h3>Latitude</h3>
-                        <input
-                            type="number"
-                            placeholder="Latitude"
-                            value={lat}
-                            onChange={updateLat} />
-                        <h3>Longitude</h3>
-                        <input
-                            type="number"
-                            placeholder="longitude"
-                            value={lng}
-                            onChange={updateLng} />
-                    </div>
-                    <div id='descriptionBlock'>
-                        <h2>Describe your place to Guests</h2>
-                        <h3>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood.</h3>
-                        <textarea
-                            type="text"
-                            placeholder="Description"
-                            required
-                            value={description}
-                            onChange={updateDescription} />
-                    </div>
-                    <div id='spotNameBlock'>
-                        <h2>Create a title for your spot</h2>
-                        <h3>Catch guests attention with a spot title that highlights what makes your place special</h3>
-                        <input
-                            type="text"
-                            placeholder="Name of Spot"
-                            required
-                            value={name}
-                            onChange={updateName} />
-                    </div>
-                    <div id='spotPrice'>
-                        <h2>Set a base price for your spot</h2>
-                        <h3>competitive pricing can help your listing stand out and rank higher in search results</h3>
-                        <h4>$</h4>
-                        <input
-                            type="text"
-                            placeholder="price"
-                            required
-                            value={price}
-                            onChange={updatePrice} />
-                    </div>
-                    <div id='imageBlock'>
-                        <h2>Liven up your spot with photos</h2>
-                        <h3>Submit a link to at least one photo to publish your spot</h3>
-                        <input
-                            type="text"
-                            placeholder="Preview Image URL"
-                            required
-                            value={previewImage}
-                            onChange={updatePreviewImage} />
-                        <input
-                            type="text"
-                            placeholder="Image URL"
-                            value={image1}
-                            onChange={updateImage1} />
-                        <input
-                            type="text"
-                            placeholder="Image URL"
-                            value={image2}
-                            onChange={updateImage2} />
-                        <input
-                            type="text"
-                            placeholder="Image URL"
-                            value={image3}
-                            onChange={updateImage3} />
-                        <input
-                            type="text"
-                            placeholder="Image URL"
-                            value={image4}
-                            onChange={updateImage4} />
-                    </div>
+        <>
+            {loaded && <div>
+                <section className="new-Spot-Form">
+                    <form className="create-spot-form" onSubmit={handleSubmit}>
+                        <div id='addressBlock'>
+                            <h1>Update Spot</h1>
+                            <h2>Where's your place Located</h2>
+                            <h3>Guests will only get your exact address once they booked a reservation.</h3>
+                            <div id="title">
+                                <div>Country</div>
+                                <div className="error" style={{ visibility: countryError }}>Country is required</div>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Country"
+                                value={country}
+                                onChange={updateCountry} />
+                            <div id="title">
+                                <div>Street Address</div>
+                                <div className="error" style={{ visibility: addressError }}>Street Address is required</div>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Address"
+                                value={address}
+                                onChange={updateAddress} />
+                            <div id="title">
+                                <div>City</div>
+                                <div className="error" style={{ visibility: cityError }}>City is required</div>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="City"
+                                value={city}
+                                onChange={updateCity} />
+                            <div id="title">
+                                <div>State</div>
+                                <div className="error" style={{ visibility: stateError }}>State is required</div>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="State"
+                                value={state}
+                                onChange={updateState} />
+                            <div id='latLng'>
+                                <div id="title">
+                                    <div>Latitude</div>
+                                </div>
+                                <input
+                                    type="number"
+                                    placeholder="Latitude"
+                                    value={lat}
+                                    onChange={updateLat} />
+                                <div id="title">
+                                    <div>Longitude</div>
+                                </div>
+                                <input
+                                    type="number"
+                                    placeholder="longitude"
+                                    value={lng}
+                                    onChange={updateLng} />
+                            </div>
+                        </div>
+                        <div id='descriptionBlock'>
+                            <h2>Describe your place to Guests</h2>
+                            <h3>Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood.</h3>
+                            <textarea
+                                type="text"
+                                placeholder="Description"
+                                value={description}
+                                onChange={updateDescription} />
+                            <div className="error" style={{ visibility: descriptionError }}>Description needs a minimum of 30 characters</div>
 
-                    <button type="submit">Update Spot</button>
-                </form>
-            </section>
-        </div>}</>
+                        </div>
+                        <div id='spotNameBlock'>
+                            <h2>Create a title for your spot</h2>
+                            <h3>Catch guests attention with a spot title that highlights what makes your place special</h3>
+                            <input
+                                type="text"
+                                placeholder="Name of Spot"
+                                value={name}
+                                onChange={updateName} />
+                            <div className="error" style={{ visibility: nameError }}>Name is required</div>
+
+                        </div>
+                        <div id='spotPrice'>
+                            <h2>Set a base price for your spot</h2>
+                            <h3>Competitive pricing can help your listing stand out and rank higher in search results</h3>
+                            <div id="price">
+                                <h4>$</h4>
+                                <input
+                                    type="text"
+                                    placeholder="price"
+                                    value={price}
+                                    onChange={updatePrice} />
+                                <div className="error" style={{ visibility: priceError }}>Price is required.</div>
+                            </div>
+                        </div>
+                        <div id='imageBlock'>
+                            <h2>Liven up your spot with photos</h2>
+                            <h3>Submit a link to at least one photo to publish your spot</h3>
+                            <input
+                                type="text"
+                                placeholder="Preview Image URL"
+                                value={previewImage}
+                                onChange={updatePreviewImage} />
+                            <div className="error" style={{ visibility: previewError }}>Preview Image is required.</div>
+                            <div id="image">
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    value={image1}
+                                    onChange={updateImage1} />
+                                <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    value={image2}
+                                    onChange={updateImage2} />
+                                <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    value={image3}
+                                    onChange={updateImage3} />
+                                <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                                <input
+                                    type="text"
+                                    placeholder="Image URL"
+                                    value={image4}
+                                    onChange={updateImage4} />
+                            </div>
+                        </div>
+                        <div id="button">
+                            <button type="submit">Create New Spot</button>
+                        </div>
+                    </form>
+                </section >
+            </div>}
+        </>
     );
 };
 

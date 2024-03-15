@@ -4,6 +4,7 @@ import { getUserReview } from "../../store/review.js";
 import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
 import UpdateReviewModal from "../UpdateReviewModal/UpdateReviewModal.jsx";
 import ConfirmDeleteModal from "../ConfirmDeleteModal/ConfirmDeleteModal.jsx";
+import './ManageReviews.css'
 import '../../index.css'
 
 const ManageReviews = () => {
@@ -25,30 +26,30 @@ const ManageReviews = () => {
     return (
         <>
             {loaded && <div>
-                    {reviews.map((details) => {
-                        return (<>
-                            <ul>
-                                {details.Spot.name}
-                            </ul>
-                            < ul >
-                                {details.review}
-                            </ul>
-                            <ul>
-                                {details.stars}
-                            </ul>
-                            <ul>
-                                <OpenModalButton
-                                    buttonText='Update'
-                                    modalComponent={<UpdateReviewModal props={{ reviewId: details.id, spotId: details.Spot.id, name: details.Spot.name }} />}
-                                />
-                                <OpenModalButton
-                                    buttonText='Delete'
-                                    modalComponent={<ConfirmDeleteModal props={{ tag: "review", id: details.id }} />}
-                                />
-                            </ul>
-                        </>
-                        )
-                    })}
+                {reviews.map((details) => {
+                    return (<>
+                        <ul>
+                            {details.Spot.name}
+                        </ul>
+                        < ul >
+                            {details.review}
+                        </ul>
+                        <ul>
+                            {details.stars}
+                        </ul>
+                        <ul>
+                            <OpenModalButton
+                                buttonText='Update'
+                                modalComponent={<UpdateReviewModal props={{ details }} />}
+                            />
+                            <OpenModalButton
+                                buttonText='Delete'
+                                modalComponent={<ConfirmDeleteModal props={{ tag: "review", id: details.id }} />}
+                            />
+                        </ul>
+                    </>
+                    )
+                })}
             </div>}
         </>
     );

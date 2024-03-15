@@ -1,0 +1,66 @@
+#displaySpots {
+    display: flex;
+    justify-content: space-around;
+    padding-left: 100px;
+    padding-right: 100px;
+    flex-wrap: wrap;
+}
+
+
+#spotBlockWButtons {
+    display: grid;
+    grid-template-columns: 175px 175px;
+    grid-template-rows: 1fr 1em;
+    grid-template-areas:
+        'spotBlock spotBlock'
+        'button1 button2'
+    ;
+}
+
+#spotBlock {
+    grid-area: spotBlock;
+    max-width: 350px;
+    padding: 10px;
+    padding-bottom: 0px;
+    display: Grid;
+    row-gap: 10px;
+    grid-template-columns: 175px 175px;
+    grid-template-rows: 350px 1em 1em 10px;
+    grid-template-areas:
+        'image image'
+        'cityState starRate'
+        'price .'
+    ;
+}
+
+#price {
+    grid-area: price;
+}
+
+#starRating {
+    grid-area: starRate;
+    justify-self: end;
+}
+
+#cityState {
+    grid-area: cityState;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#preImage {
+    grid-area: image;
+    max-height: 350px;
+    max-width: 350px;
+    border: 1px solid black;
+    border-radius: 18px;
+}
+
+#updateButton {
+    grid-area: button1;
+}
+
+#deleteButton {
+    grid-area: button2;
+}

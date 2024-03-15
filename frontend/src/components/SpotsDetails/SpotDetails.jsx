@@ -7,6 +7,9 @@ import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
 import CreateReviewModal from "../CreateReviewModal/CreateReviewModal.jsx";
 import UpdateReviewModal from "../UpdateReviewModal/UpdateReviewModal.jsx";
 import ConfirmDeleteModal from "../ConfirmDeleteModal/ConfirmDeleteModal.jsx";
+import { LuDot } from "react-icons/lu";
+import { FaStar } from "react-icons/fa";
+import './SpotDetails.css'
 import '../../index.css'
 
 const Spots = () => {
@@ -22,7 +25,7 @@ const Spots = () => {
     let comingSoon = () => alert("Feature coming soon")
 
     const numRev = reviews.length
-    let revRating = 'new'
+    let revRating = 'New'
     if (numRev === 1) {
         revRating = `${numRev} Review`
     } else if (numRev > 1) {
@@ -33,7 +36,7 @@ const Spots = () => {
     let starRating
     if (!starRat) {
         starRating = 0
-    }else {
+    } else {
         starRating = spotDetails.avgStarRating.toFixed(1)
     }
 
@@ -46,63 +49,81 @@ const Spots = () => {
 
     return (<>
 
-        {loaded && <div>
-            <div>{spotDetails.name}</div>
-            <div>{spotDetails.city}, {spotDetails.state}, {spotDetails.country}  </div>
-            {spotDetails.SpotImages.forEach((image) => (spotImages.push(image.url)))}
-            {spotImages.map((image) => {
-                return (
-                    <>
-                        <img src={image} alt="image" />
-                    </>
-                )
-            })}
-            <div>Hosted by {spotDetails.Owner.firstName} {spotDetails.Owner.lastName}</div>
-            <div>{spotDetails.description}</div>
-
-            <div className="reserve-container">
-                <div>${spotDetails.price} night</div>
-                <div>star {starRating}</div>
-                <div>{revRating}</div>
-                <button onClick={comingSoon}>Reserve</button>
-            </div>
-
-            <ul hidden={session.user && spotDetails.ownerId === session.user.id}>
-                <OpenModalButton
-                    buttonText='Create Review'
-                    modalComponent={<CreateReviewModal props={{ spotId:spotId, name:spotDetails.name }} />}
-                />
-            </ul>
-            <ul>
-                <div className="reviews-container">
-                    <div>star {starRating}</div>
-                    <div>{revRating}</div>
-                    <span hidden={reviews.length !== 0 || (session.user && spotDetails.ownerId === session.user.id)}>Be the first to post a review!</span>
-                    <div className="review-data">
-                        {reviews && reviews.map((review) => {
-                            const date = review.createdAt.split('-')
-                            const dateCreated = [months[date[1] - 1], date[0]].join(' ')
-                            return (
-                                <div key={review.Id}>
-                                    <p>{review.User.firstName}</p>
-                                    <p>{dateCreated}</p>
-                                    <p>{review.review}</p>
-                                    <ul hidden={session.user && review.userId !== session.user.id}>
-                                        <OpenModalButton
-                                            buttonText='Update'
-                                            modalComponent={<UpdateReviewModal props={{ reviewId: review.id, spotId: review.spotId }} />}
-                                        />
-                                        <OpenModalButton
-                                            buttonText='Delete'
-                                            modalComponent={<ConfirmDeleteModal props={{ tag: "review", id: review.id }} />}
-                                        />
-                                    </ul>
+        {loaded && <div id="spotDetails">
+            <div id="info">
+                <h1 id="spotName">{spotDetails.name}</h1>
+                <h3 id="spotLocation">{spotDetails.city}, {spotDetails.state}, {spotDetails.country}  </h3>
+                <div id="spotImages">
+                    {spotDetails.SpotImages.forEach((image) => (spotImages.push({ id: image.id, url: image.url })))}
+                    {spotImages.map((image) => {
+                        return (
+                            <>
+                                <div id={`image${spotImages.indexOf(image)}`}>
+                                    <img src={image.url} alt="image" />
                                 </div>
-                            )
-                        })}
+                            </>
+                        )
+                    })}
+                </div>
+                <div id="infoArea">
+                    <h2 id="host">Hosted by {spotDetails.Owner.firstName} {spotDetails.Owner.lastName}</h2>
+                    <h4 id="dis">{spotDetails.description}</h4>
+
+                    <div id="reserve">
+                        <div id="cost">
+                            <h2>${spotDetails.price}</h2>
+                            <h4>night</h4>
+                        </div>
+                        <div id="rating">
+                            <div><FaStar />{starRating}</div>
+                            <LuDot />
+                            <div>{revRating}</div>
+                        </div>
+                        <div id="reserveButtonContainer">
+                            <button className="reserveButton" onClick={comingSoon}>Reserve</button>
+                        </div>
                     </div>
                 </div>
-            </ul>
+            </div>
+
+            <div id="reviews">
+                <div id='reviewRating'>
+                    <div><FaStar /> {starRating}</div>
+                    <LuDot />
+                    <div hidden={revRating === 'New'}>{revRating}</div>
+                    <div hidden={reviews.length !== 0 || (session.user && spotDetails.ownerId === session.user.id)}>Be the first to post a review!</div>
+                </div>
+                <div hidden={session.user && spotDetails.ownerId === session.user.id}>
+                    <OpenModalButton
+                        buttonText='Create Review'
+                        modalComponent={<CreateReviewModal props={{ spotId: spotId, name: spotDetails.name }} />}
+                    />
+                </div>
+                {reviews && reviews.map((review) => {
+                    const date = review.createdAt.split('-')
+                    const dateCreated = [months[date[1] - 1], date[0]].join(' ')
+                    return (
+                        <div id="reviewText">
+                            <div key={review.Id}>
+                                <div id="userName">{review.User.firstName}</div>
+                                <div id="dateCreated">{dateCreated}</div>
+                                <div id="text">{review.review}</div>
+                                <div hidden={session.user && review.userId !== session.user.id}>
+                                    <OpenModalButton
+                                        buttonText='Update'
+                                        modalComponent={<UpdateReviewModal props={{ reviewId: review.id, spotId: review.spotId }} />}
+                                    />
+                                    <OpenModalButton
+                                        buttonText='Delete'
+                                        modalComponent={<ConfirmDeleteModal props={{ tag: "review", id: review.id }} />}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+
         </div>}
     </>
     );

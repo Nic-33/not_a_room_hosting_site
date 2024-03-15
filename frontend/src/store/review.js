@@ -48,6 +48,7 @@ export const getUserReview = () => async dispatch => {
         const review = await response.json()
         // console.log("this is the reviews in the if block:", review)
         dispatch(loadReview(review.Review))
+        return review
     }
 }
 
@@ -60,9 +61,10 @@ export const createNewReview = (payload, spotId) => async dispatch => {
         },
         body: JSON.stringify(payload)
     })
-    // console.log('if statment res for createreview:', response)
+    console.log('if statment res for createreview:', response.status)
     if (response.ok) {
         const review = await response.json()
+        console.log('revreev', review)
         dispatch(createReview(review))
     }
 }
@@ -76,10 +78,11 @@ export const updateReviewInfo = (payload, reviewId) => async dispatch => {
         },
         body: JSON.stringify(payload)
     })
-    console.log('if statment res for createreview:', response)
+    // console.log('if statment res for createreview:', response.error)
     if (response.ok) {
         const review = await response.json()
-        dispatch(createReview(review))
+        console.log('review', review)
+        dispatch(updateReview(review))
     }
 }
 
@@ -94,26 +97,28 @@ const reviewReducer = (state = initialState, action) => {
             return newState;
         }
         case GET_REVIEW_FOR_USER: {
-            const newState = { ...state };
+            const newState = {};
             // console.log('action review:', newState)
             action.review.forEach(review => (newState[review.id] = review))
             return newState;
         }
         case CREATE_REVIEW: {
+            console.log('action', action)
+            console.log('state', state)
             return {
                 ...state,
                 [action.review.Id]: {
                     ...state[action.review.Id],
-                    review: [...state[action.review.Id].review, action.review.id]
+                    review: [...state[action.review.id],action.review]
                 }
             }
         }
         case UPDATE_REVIEW: {
             return {
                 ...state,
-                [action.review.Id]: {
-                    ...state[action.review.Id],
-                    review: [...state[action.review.Id].review, action.review.id]
+                [action.review.id]: {
+                    ...state[action.review.id],
+                    ...action.review
                 }
             }
 

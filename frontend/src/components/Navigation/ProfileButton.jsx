@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { FaUserCircle } from 'react-icons/fa';
+import { CiBoxList } from "react-icons/ci";
 import * as sessionActions from '../../store/session';
 import OpenModalButton from '../OpenModalButton/OpenModalButton';
 import LoginFormModal from '../LoginFormModal/LoginFormModal';
 import SignupFormModal from '../SignupFormModal/SignupFormModal';
 import { NavLink } from 'react-router-dom';
-
+import './ProfileButton.css'
 
 function ProfileButton({ user }) {
     const dispatch = useDispatch();
@@ -41,7 +42,8 @@ function ProfileButton({ user }) {
 
     return (
         <>
-            <button onClick={toggleMenu}>
+            <button className='profileButton' onClick={toggleMenu}>
+                <CiBoxList />
                 <FaUserCircle />
             </button>
             <ul className={ulClassName} ref={ulRef}>
@@ -51,10 +53,10 @@ function ProfileButton({ user }) {
                         <li>{user.firstName} {user.lastName}</li>
                         <li>{user.email}</li>
                         <li>
-                        <NavLink key='manageSpot' to={'/spots/current'}>Manage Spots</NavLink>
+                            <NavLink key='manageSpot' to={'/spots/current'}>Manage Spots</NavLink>
                         </li>
                         <li>
-                        <NavLink key='manageReviews' to={'/reviews/current'}>Manage Reviews</NavLink>
+                            <NavLink key='manageReviews' to={'/reviews/current'}>Manage Reviews</NavLink>
                         </li>
                         <li>
                             <button onClick={logout}>Log Out</button>

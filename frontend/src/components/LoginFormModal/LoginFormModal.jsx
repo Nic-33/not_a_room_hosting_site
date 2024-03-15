@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as sessionActions from '../../store/session';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
-// import './LoginForm.css';
+import './LoginFormModal.css';
 import '../../index.css'
 
 function LoginFormModal() {
@@ -52,13 +52,13 @@ function LoginFormModal() {
         )}
         <button type="submit">Log In</button>
         <ol>
-        <button
-          type='submit'
-          onClick={() => {
-            setCredential('Demo-lition')
-            setPassword('password')
-          }}
-        >Demo User</button>
+          <button
+            type='submit'
+            onClick={() => {
+              setCredential('Demo-lition')
+              setPassword('password')
+            }}
+          >Demo User</button>
         </ol>
       </form>
     </>

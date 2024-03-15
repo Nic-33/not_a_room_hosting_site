@@ -4,6 +4,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getSpots, getUserSpots } from "../../store/spots.js";
 import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
 import ConfirmDeleteModal from "../ConfirmDeleteModal/ConfirmDeleteModal.jsx";
+import { FaStar } from "react-icons/fa";
+
+import './ManageSpots.css'
 import '../../index.css'
 
 
@@ -28,26 +31,39 @@ const ManageSpot = () => {
 
 
     return (<>
-        {loaded && <div>
+        {loaded && <div >
 
             <NavLink to='/spots/new'>Create a New Spot</NavLink>
 
             {spotDetails.map((details) => {
+                const starRat = details.avgRating
+                let starRating
+                if (!starRat) {
+                    starRating = 'New'
+                } else {
+                    starRating = details.avgRating.toFixed(1)
+                }
                 return (<>
-                    <div>
+                    <div id="displaySpots">
+                        <div id="spotBlockWButtons">
                         <NavLink key={details.name} to={`/${details.id}`}>
-                            <img src={details.previewImage} alt={details.name} />
-                            <div>{details.city}, {details.state}</div>
-                            <div>{details.avgRating.toFixed(1)} Stars</div>
-                            <div>${details.price} night</div>
+                            <div id="spotBlock">
+                                <img id='preImage' src={details.previewImage} alt={details.name} />
+                                <div id="cityState">{details.city}, {details.state}</div>
+                                <div id="starRating"><FaStar />{starRating}</div>
+                                <div id="price">${details.price} night</div>
+                            </div>
                         </NavLink>
-                        <ul>
+                        <div id="updateButton">
                             <button onClick={() => UpdateSpotForm(details.id)}>Update</button>
+                        </div>
+                        <div id='deleteButton'>
                             <OpenModalButton
                                 buttonText='Delete'
                                 modalComponent={<ConfirmDeleteModal props={{ tag: "spot", id: details.id }} />}
                             />
-                        </ul>
+                        </div>
+                        </div>
                     </div>
                 </>
                 )

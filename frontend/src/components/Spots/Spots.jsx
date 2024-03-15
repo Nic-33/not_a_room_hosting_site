@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink, useParams } from "react-router-dom";
 import { getSpots } from "../../store/spots.js";
+import { FaStar } from "react-icons/fa";
+import './Spots.css'
 import '../../index.css'
 
 const Spots = () => {
@@ -19,26 +21,26 @@ const Spots = () => {
     }, [dispatch])
 
     return (<>
-        {loaded && <div>
+        {loaded && <div id='displaySpots'>
             {spots.map((spot) => {
                 const starRat = spot.avgRating
                 let starRating
                 if (!starRat) {
-                    starRating = 0
+                    starRating = 'New'
                 } else {
-                    starRating = spot.avgRating.toFixed(1)
+                    starRating = `${spot.avgRating.toFixed(1)}`
                 }
                 // console.log('spot.previewimage:', spot.previewImage)
                 return (
                     <>
-                    <div id='spotBlock'>
                         <NavLink key={spot.name} to={`/${spot.id}`}>
-                            <img src={spot.previewImage} alt={spot.name} />
-                            <div id='cityState'>{spot.city}, {spot.state}</div>
-                            <div id='starRating'>{starRating} stars</div>
-                            <div id='price'>${spot.price} night</div>
+                            <div id='spotBlock'>
+                                <img id="preImage" src={spot.previewImage} alt={spot.name} />
+                                <div id='cityState'>{spot.city}, {spot.state}</div>
+                                <div id='starRating'><FaStar />{starRating}</div>
+                                <div id='price'>${spot.price} night</div>
+                            </div>
                         </NavLink>
-                    </div>
                     </>
                 )
             })}

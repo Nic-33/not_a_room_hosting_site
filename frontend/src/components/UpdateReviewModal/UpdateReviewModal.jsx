@@ -1,37 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useModal } from '../../context/Modal';
-import { getReview, updateReviewInfo } from '../../store/review';
-// import './LoginForm.css';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateReviewInfo } from '../../store/review';
+import './UpdateReviewModal.css';
 import '../../index.css'
 
 function UpdateReviewModal(props) {
-    const { reviewId, spotId, name } = props.props
-    const dispatch = useDispatch();
-    const reviews = useSelector(state => state.review)
-    const reviewValues = Object.values(reviews)
-    const updateReview = reviewValues.find(({ id }) => id === reviewId)
-    const [review, setReview] = useState(updateReview.review);
-    const [stars, setStars] = useState(updateReview.stars);
-    const [loaded, setLoaded] = useState(false)
+    console.log('props', props)
+    const { id, review, stars } = props.props.details
 
-    const { closeModal } = useModal();
+    const dispatch = useDispatch();
+    const [reviewState, setReview] = useState(review);
+    const [starsState, setStars] = useState(stars);
+
     console.log('stars:', stars)
 
-    useEffect(() => {
-        dispatch(getReview(spotId))
-            .then(() => setLoaded(true))
-    }, [dispatch, spotId])
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         let createSpotReview = {
-            review,
-            stars
+            review: reviewState,
+            stars: starsState
         }
         console.log('CreateSpotReview:', createSpotReview)
         if (createSpotReview) {
-            dispatch(updateReviewInfo(createSpotReview, reviewId))
+            dispatch(updateReviewInfo(createSpotReview, id))
             window.location.reload(false)
         }
     };
@@ -39,14 +30,15 @@ function UpdateReviewModal(props) {
 
     return (
         <>
-            {loaded && <div>
-                <h1>How was your stay at {name}</h1>
-                <form onSubmit={handleSubmit}>
+            <div id='review'>
+                <div id='spotTitle'>How was your stay at {props.props.details.Spot.name}</div>
+                <form id='reviewInfo' onSubmit={handleSubmit}>
                     <label>
                         <textarea
+                            id='reviewText'
                             type="text"
                             placeholder='Just a quick review'
-                            value={review}
+                            value={reviewState}
                             onChange={(e) => setReview(e.target.value)}
                             required
                         />
@@ -65,9 +57,11 @@ function UpdateReviewModal(props) {
                             <label htmlFor="star1" title="text"></label>
                         </div>
                     </label>
-                    <button type="submit">Update Your Review</button>
+                    <div id='button'>
+                        <button type="submit">Update Your Review</button>
+                    </div>
                 </form>
-            </div>}
+            </div>
         </>
     );
 }

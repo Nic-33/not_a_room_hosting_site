@@ -75,10 +75,12 @@ export const getSpot = (spotId) => async dispatch => {
         const spots = await res.json()
         console.log("this is the single spot in the if block:", spots)
         dispatch(loadASpot(spots))
+        return spots
     }
 }
 
 export const updateSpot = (payload, spotId) => async dispatch => {
+    console.log('update spotId', spotId)
     const res = await csrfFetch(`/api/spots/${spotId}`, {
         method: 'PUT',
         headers: {
@@ -113,18 +115,18 @@ const spotsReducer = (state = initialState, action) => {
         case CREATE_SPOT: {
             return {
                 ...state,
-                [action.spots.Id]: {
-                    ...state[action.spots.Id],
-                    spots: [state[action.spots.Id], action.spots.id]
+                [action.spots.id]: {
+                    ...state[action.spots.id],
+                    spots: [state[action.spots.id], action.spots.id]
                 }
             }
         }
         case UPDATE_SPOT: {
             return {
                 ...state,
-                [action.spots.Id]: {
-                    ...state[action.spots.Id],
-                    spots: [...state[action.spots.Id].spots, action.spots.id]
+                [action.spot.id]: {
+                    ...state[action.spot.id],
+                    spots: [state[action.spot.id], action.spot.id]
                 }
             }
         }

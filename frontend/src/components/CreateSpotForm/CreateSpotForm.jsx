@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSpot } from "../../store/spots";
 import { createNewSpotImages } from "../../store/spotImages";
+import './CreateSpotForm.css'
 import '../../index.css'
 
 const CreateSpotForm = () => {
@@ -14,7 +15,7 @@ const CreateSpotForm = () => {
     const [country, setCountry] = useState('')
     const [lat, setLat] = useState()
     const [lng, setLng] = useState()
-    const [name, setName] = useState()
+    const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [price, setPrice] = useState('')
     const [previewImage, setPreviewImage] = useState('')
@@ -22,6 +23,16 @@ const CreateSpotForm = () => {
     const [image2, setImage2] = useState('')
     const [image3, setImage3] = useState('')
     const [image4, setImage4] = useState('')
+    const [addressError, setAddressError] = useState("hidden")
+    const [countryError, setCountryError] = useState("hidden")
+    const [cityError, setCityError] = useState("hidden")
+    const [stateError, setStateError] = useState("hidden")
+    const [descriptionError, setDescriptionError] = useState("hidden")
+    const [nameError, setNameError] = useState("hidden")
+    const [priceError, setPriceError] = useState("hidden")
+    const [previewError, setPreviewError] = useState("hidden")
+
+    console.log(addressError)
 
     const updateAddress = (e) => setAddress(e.target.value)
     const updateCity = (e) => setCity(e.target.value)
@@ -52,8 +63,51 @@ const CreateSpotForm = () => {
             price
         }
 
+        setAddressError("hidden")
+        setCityError("hidden")
+        setCountryError("hidden")
+        setDescriptionError("hidden")
+        setStateError("hidden")
+        setNameError("hidden")
+        setPriceError("hidden")
+        setPreviewError("hidden")
 
-        if (createSpotInfo) {
+        let error = true
+        if (address.length === 0) {
+            setAddressError('visible')
+            error = false
+        }
+        if (!(city)) {
+            setCityError('visible')
+            error = false
+        }
+        if (!(state)) {
+            setStateError('visible')
+            error = false
+        }
+        if (!(country) || country.length === 0) {
+            setCountryError('visible')
+            error = false
+        }
+        if (description.length < 1) {
+            setDescriptionError('visible')
+            error = false
+        }
+        if (!(name)) {
+            setNameError('visible')
+            error = false
+        }
+        if (!(price) || price < 1) {
+            setPriceError('visible')
+            error = false
+        }
+        if (!(previewImage) || previewImage.length === 0) {
+            setPreviewError('visible')
+            error = false
+        }
+
+
+        if (error) {
             let spot = await dispatch(createSpot(createSpotInfo))
             console.log('spot inside createspot:', spot)
             if (previewImage.length) {
@@ -72,55 +126,72 @@ const CreateSpotForm = () => {
                 dispatch(createNewSpotImages({ url: image4, preview: false }, spot.id))
             }
             navigate(`/${spot.id}`)
+        } else {
+            return
         }
     }
+
     return (
         <section className="new-Spot-Form">
-            <h1>Create a new Spot</h1>
-            <h2>Where's your place Located</h2>
-            <h3>Guests will only get your exact address once they booked a reservation.</h3>
             <form className="create-spot-form" onSubmit={handleSubmit}>
                 <div id='addressBlock'>
-                    <h3>Country</h3>
+                    <h1>Create a new Spot</h1>
+                    <h2>Where's your place Located</h2>
+                    <h3>Guests will only get your exact address once they booked a reservation.</h3>
+                    <div id="title">
+                        <div>Country</div>
+                        <div className="error" style={{ visibility: countryError }}>Country is required</div>
+                    </div>
                     <input
                         type="text"
                         placeholder="Country"
-                        required
                         value={country}
                         onChange={updateCountry} />
-                    <h3>Street Address</h3>
+                    <div id="title">
+                        <div>Street Address</div>
+                        <div className="error" style={{ visibility: addressError }}>Street Address is required</div>
+                    </div>
                     <input
                         type="text"
                         placeholder="Address"
-                        required
                         value={address}
                         onChange={updateAddress} />
-                    <h3>City</h3>
+                    <div id="title">
+                        <div>City</div>
+                        <div className="error" style={{ visibility: cityError }}>City is required</div>
+                    </div>
                     <input
                         type="text"
                         placeholder="City"
-                        required
                         value={city}
                         onChange={updateCity} />
-                    <h3>State</h3>
+                    <div id="title">
+                        <div>State</div>
+                        <div className="error" style={{ visibility: stateError }}>State is required</div>
+                    </div>
                     <input
                         type="text"
                         placeholder="State"
-                        required
                         value={state}
                         onChange={updateState} />
-                    <h3>Latitude</h3>
-                    <input
-                        type="number"
-                        placeholder="Latitude"
-                        value={lat}
-                        onChange={updateLat} />
-                    <h3>Longitude</h3>
-                    <input
-                        type="number"
-                        placeholder="longitude"
-                        value={lng}
-                        onChange={updateLng} />
+                    <div id='latLng'>
+                        <div id="title">
+                            <div>Latitude</div>
+                        </div>
+                        <input
+                            type="number"
+                            placeholder="Latitude"
+                            value={lat}
+                            onChange={updateLat} />
+                        <div id="title">
+                            <div>Longitude</div>
+                        </div>
+                        <input
+                            type="number"
+                            placeholder="longitude"
+                            value={lng}
+                            onChange={updateLng} />
+                    </div>
                 </div>
                 <div id='descriptionBlock'>
                     <h2>Describe your place to Guests</h2>
@@ -128,9 +199,10 @@ const CreateSpotForm = () => {
                     <textarea
                         type="text"
                         placeholder="Description"
-                        required
                         value={description}
                         onChange={updateDescription} />
+                    <div className="error" style={{ visibility: descriptionError }}>Description needs a minimum of 30 characters</div>
+
                 </div>
                 <div id='spotNameBlock'>
                     <h2>Create a title for your spot</h2>
@@ -138,20 +210,23 @@ const CreateSpotForm = () => {
                     <input
                         type="text"
                         placeholder="Name of Spot"
-                        required
                         value={name}
                         onChange={updateName} />
+                    <div className="error" style={{ visibility: nameError }}>Name is required</div>
+
                 </div>
                 <div id='spotPrice'>
                     <h2>Set a base price for your spot</h2>
-                    <h3>competitive pricing can help your listing stand out and rank higher in search results</h3>
-                    <h4>$</h4>
-                    <input
-                        type="text"
-                        placeholder="price"
-                        required
-                        value={price}
-                        onChange={updatePrice} />
+                    <h3>Competitive pricing can help your listing stand out and rank higher in search results</h3>
+                    <div id="price">
+                        <h4>$</h4>
+                        <input
+                            type="text"
+                            placeholder="price"
+                            value={price}
+                            onChange={updatePrice} />
+                        <div className="error" style={{ visibility: priceError }}>Price is required.</div>
+                    </div>
                 </div>
                 <div id='imageBlock'>
                     <h2>Liven up your spot with photos</h2>
@@ -159,33 +234,40 @@ const CreateSpotForm = () => {
                     <input
                         type="text"
                         placeholder="Preview Image URL"
-                        required
                         value={previewImage}
                         onChange={updatePreviewImage} />
-                    <input
-                        type="text"
-                        placeholder="Image URL"
-                        value={image1}
-                        onChange={updateImage1} />
-                    <input
-                        type="text"
-                        placeholder="Image URL"
-                        value={image2}
-                        onChange={updateImage2} />
-                    <input
-                        type="text"
-                        placeholder="Image URL"
-                        value={image3}
-                        onChange={updateImage3} />
-                    <input
-                        type="text"
-                        placeholder="Image URL"
-                        value={image4}
-                        onChange={updateImage4} />
+                    <div className="error" style={{ visibility: previewError }}>Preview Image is required.</div>
+                    <div id="image">
+                        <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={image1}
+                            onChange={updateImage1} />
+                        <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                        <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={image2}
+                            onChange={updateImage2} />
+                        <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                        <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={image3}
+                            onChange={updateImage3} />
+                        <div className="error" hidden={true}>Image URL must end in .png, .jpg, or .jpeg</div>
+                        <input
+                            type="text"
+                            placeholder="Image URL"
+                            value={image4}
+                            onChange={updateImage4} />
+                    </div>
                 </div>
-                <button type="submit">Create new Spot</button>
+                <div id="button">
+                    <button type="submit">Create New Spot</button>
+                </div>
             </form>
-        </section>
+        </section >
     );
 };
 

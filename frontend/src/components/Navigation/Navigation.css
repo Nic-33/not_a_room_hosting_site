@@ -1,3 +1,54 @@
 .hidden {
     display: none;
 }
+
+.navbarContainer {
+    display: grid !important;
+    grid-template-columns: repeat(2, 50%);
+    grid-template-areas: 'left right';
+    border-bottom: 1px solid black;
+}
+
+#leftStuff {
+    grid-area: left;
+    display: grid !important;
+    grid-template-columns: 70px 1fr;
+    grid-template-areas: 'logo title';
+    align-items: center;
+
+}
+
+#rightStuff {
+    grid-area: right;
+    display: grid !important;
+    grid-template-columns: 1fr 70px;
+    grid-template-areas: ' newSpot menu';
+    align-items: center;
+    justify-items: end;
+
+}
+
+#logoArea {
+    grid-area: logo;
+    ;
+}
+
+#Title {
+    grid-area: title;
+
+}
+
+
+#newSpot {
+    grid-area: newSpot;
+}
+
+#profileButton {
+    grid-area: menu;
+    padding-right: 10px;
+}
+
+#logo {
+    padding-left: 10px;
+    max-height: 50px;
+}

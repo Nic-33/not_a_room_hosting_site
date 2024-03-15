@@ -1,0 +1,106 @@
+.new-Spot-Form {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+.create-spot-form {
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+        'addressBlock'
+        'descriptionBlock'
+        'spotNameBlock'
+        'spotPrice'
+        'imageBlock'
+    ;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-bottom: 10px;
+}
+
+#addressBlock {
+    grid-area: addressBlock;
+    border-bottom: 2px solid black;
+}
+
+#descriptionBlock {
+    grid-area: descriptionBlock;
+    border-bottom: 2px solid black;
+}
+
+#spotNameBlock {
+    grid-area: spotNameBlock;
+    border-bottom: 2px solid black;
+
+}
+
+#spotPrice {
+    grid-area: spotPrice;
+    border-bottom: 2px solid black;
+
+}
+
+#price{
+    display: flex;
+}
+
+#imageBlock {
+    grid-area: imageBlock;
+    border-bottom: 2px solid black;
+
+}
+
+#title {
+    display: flex;
+}
+
+#latLng {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+}
+
+input {
+    width: 100%;
+    height: 1em;
+}
+
+textarea {
+    width: 100%;
+    height: 10em;
+}
+
+#button {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+#button>button {
+    color: black;
+    font-size: 29px;
+    line-height: 29px;
+    padding: 7px;
+    border-radius: 48px;
+    font-family: Georgia, serif;
+    font-weight: normal;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    background-color: red;
+    box-shadow: rgb(0, 0, 0) 5px 5px 15px 5px;
+    border: 2px solid black;
+    display: inline-block;
+}
+
+#button>button:hover {
+    background: rgb(194, 0, 0);
+}
+
+#button>button:active {
+    background: #144E75;
+}
