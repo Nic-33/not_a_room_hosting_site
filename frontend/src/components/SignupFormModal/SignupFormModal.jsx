@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
 import * as sessionActions from '../../store/session';
-// import './SignupForm.css';
+import './SignupFormModal.css';
 import '../../index.css'
 
 function SignupFormModal() {
@@ -45,6 +45,7 @@ function SignupFormModal() {
 
   return (
     <>
+      <div id='signUpForm'>
       <h1>Sign Up</h1>
       <form onSubmit={handleSubmit}>
         <label>
@@ -111,6 +112,7 @@ function SignupFormModal() {
         )}
         <button type="submit">Sign Up</button>
       </form>
+    </div >
     </>
   );
 }

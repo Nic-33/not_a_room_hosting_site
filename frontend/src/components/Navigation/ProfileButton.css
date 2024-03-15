@@ -8,7 +8,7 @@
     background-color: white;
 }
 
-.profile-dropdown>li {
+.profile-dropdown {
     list-style-type: none;
 }
 
@@ -35,4 +35,61 @@
 
 .profileButton:active {
     background: lightgray;
+}
+
+#link1 {
+    border-top: 1px solid black;
+}
+
+#link2 {
+    border-bottom: 1px solid black;
+}
+
+
+#loggedIn>li>button {
+    color: rgb(211, 211, 211);
+    font-size: 16px;
+    line-height: 16px;
+    padding: 7px;
+    border-radius: 48px;
+    font-family: Georgia, serif;
+    font-weight: normal;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    background-color: grey;
+    border: 2px solid black;
+}
+
+#loggedIn>li>button:hover {
+    background: rgb(65, 65, 65);
+}
+
+#loggedIn>li>button:active {
+    background: rgb(192, 192, 192);
+}
+
+#loggedOut>li>button {
+    color: rgb(211, 211, 211);
+    font-size: 16px;
+    line-height: 16px;
+    padding: 7px;
+    border-radius: 48px;
+    font-family: Georgia, serif;
+    font-weight: normal;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+    background-color: grey;
+    border: 2px solid black;
+}
+
+#loggedOut>li>button:hover {
+    background: rgb(65, 65, 65);
+}
+
+#loggedOut>li>button:active {
+    background: rgb(192, 192, 192);
 }

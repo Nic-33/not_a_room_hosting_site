@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProfileButton from './ProfileButton';
-import logo from '../../Images/temp_image.jpg'
+import logo from '../../Images/temp_image.png'
 import './Navigation.css';
 
 function Navigation({ isLoaded }) {
@@ -14,7 +14,7 @@ function Navigation({ isLoaded }) {
           <img id='logo' src={logo} alt="home" />
         </NavLink>
         <NavLink id='Title' to="/">
-          <div >Not A Room Hosting Site</div>
+          <div id='titleText'>Not A Room Hosting Site</div>
         </NavLink>
       </div>
       <div id='rightStuff'>
