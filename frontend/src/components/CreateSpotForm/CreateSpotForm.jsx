@@ -136,7 +136,7 @@ const CreateSpotForm = () => {
             <form className="create-spot-form" onSubmit={handleSubmit}>
                 <div id='addressBlock'>
                     <h1>Create a new Spot</h1>
-                    <h2>Where's your place Located</h2>
+                    <h2>Where is your place Located</h2>
                     <h3>Guests will only get your exact address once they booked a reservation.</h3>
                     <div id="title">
                         <div>Country</div>

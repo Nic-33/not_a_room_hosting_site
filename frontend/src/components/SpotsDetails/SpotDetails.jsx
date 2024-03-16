@@ -58,7 +58,7 @@ const Spots = () => {
                     {spotImages.map((image) => {
                         return (
                             <>
-                                <div id={`image${spotImages.indexOf(image)}`}>
+                                <div id={`image${spotImages.indexOf(image)}`} key={spotImages.indexOf(image)}>
                                     <img src={image.url} alt="image" />
                                 </div>
                             </>
@@ -103,8 +103,8 @@ const Spots = () => {
                     const date = review.createdAt.split('-')
                     const dateCreated = [months[date[1] - 1], date[0]].join(' ')
                     return (
-                        <div id="reviewText">
-                            <div key={review.Id}>
+                        <div id="reviewText" key={review.Id}>
+                            <div >
                                 <div id="userName">{review.User.firstName}</div>
                                 <div id="dateCreated">{dateCreated}</div>
                                 <div id="text">{review.review}</div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink, useNavigate } from "react-router-dom";
-import { getSpots, getUserSpots } from "../../store/spots.js";
+import { getUserSpots } from "../../store/spots.js";
 import OpenModalButton from "../OpenModalButton/OpenModalButton.jsx";
 import ConfirmDeleteModal from "../ConfirmDeleteModal/ConfirmDeleteModal.jsx";
 import { FaStar } from "react-icons/fa";
@@ -14,7 +14,6 @@ const ManageSpot = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const [loaded, setLoaded] = useState(false)
-    const sessionId = useSelector(state => state.session.user.id)
     const allSpots = useSelector((state) => state.spots)
     const spotDetails = Object.values(allSpots)
 

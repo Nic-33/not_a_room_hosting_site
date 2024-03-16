@@ -31,17 +31,17 @@ export const createNewSpotImages = (payload, spotId) => async dispatch => {
     }
 }
 
-export const updateSpotImages = (payload, spotImageId) => async dispatch => {
-    const response = await csrfFetch(`/api/reviews/${reviewId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    })
-    console.log('if statment res for createreview:', response)
-    if (response.ok) {
-        const review = await response.json()
-        dispatch(createReview(review))
-    }
-}
+// export const updateSpotImages = (payload) => async dispatch => {
+//     const response = await csrfFetch(`/api/reviews/${reviewId}`, {
+//         method: 'PUT',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(payload)
+//     })
+//     console.log('if statment res for createreview:', response)
+//     if (response.ok) {
+//         const review = await response.json()
+//         dispatch(createReview(review))
+//     }
+// }
